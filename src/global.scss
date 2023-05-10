@@ -1,0 +1,127 @@
+@import "themes.scss";
+
+@import "bulma/bulma.sass";
+@import "boxicons/css/boxicons.min.css";
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+html {
+  background-color: var(--bg);
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+}
+
+body {
+  color: var(--fg);
+  margin: auto;
+  padding: 0 5% 0 calc($sidebar-width + 5%);
+}
+
+nav#navbar {
+  background-color: var(--bg);
+  box-shadow: 0 2px 0 0 var(--bg-alt);
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+h1 {
+  @extend .center;
+
+  font-size: 2rem;
+  margin: 1rem auto;
+}
+
+h1 + p,
+div + p,
+section + section {
+  margin-top: 2rem;
+}
+
+h1 + div,
+p + p {
+  margin-top: 1.5rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+hr {
+  background-color: var(--bg-alt);
+}
+
+a:hover {
+  color: var(--grey);
+}
+
+a[href^="http"][target="_blank"] {
+  align-items: center;
+  display: inline-flex;
+}
+
+a[href^="http"][target="_blank"]::after {
+  content: url("icons/bx-link-external.svg");
+  transform: scale(0.5) translate(-0.2em, -0.5em);
+  max-height: 1em;
+  max-width: 0.8em;
+}
+
+a[href^="http"][target="_blank"]:hover::after {
+  filter: var(--grey-filter);
+}
+
+.field:has(input[required], textarea[required]) label::after {
+    color: var(--red);
+    content: '\a0*';
+    font-weight: bold;
+}
+
+.switch-wrapper input[type="checkbox"]:checked+.switch-slider {
+  background-color: white;
+}
+
+.switch-wrapper input[type="checkbox"]:checked+.switch-slider .switch-knob {
+  left: calc(100% - 19px - 3px);
+  background-color: #44cc66;
+}
+
+.switch-wrapper .switch-slider {
+  background-color: white;
+  -webkit-box-shadow: 2px 4px 8px rgba(200, 200, 200, 0.5);
+  box-shadow: 2px 4px 8px rgba(200, 200, 200, 0.5);
+  border-radius: 5px;
+}
+
+.switch-wrapper .switch-knob {
+  width: calc(25px - 6px);
+  height: calc(25px - 6px);
+  border-radius: 5px;
+  left: 3px;
+  top: 3px;
+  background-color: #e6e6e6;
+}
+
+// .button,
+// .button:active,
+// .button:focus,
+// .button:focus:not(:active) {
+//   color: var(--green);
+//   background: none;
+//   border-color: var(--green);
+//   box-shadow: none;
+// }
+
+// .button:hover {
+//   color: var(--fg);
+//   border-color: var(--green);
+// }
