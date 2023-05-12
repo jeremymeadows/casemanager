@@ -8,6 +8,7 @@ CREATE TABLE users (
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(60) NOT NULL,
   name VARCHAR(32) NOT NULL,
+  is_admin BOOLEAN NOT NULL DEFAULT FALSE;
   PRIMARY KEY (user_id)
 );
 
@@ -42,7 +43,7 @@ CREATE TABLE cases (
 
 
 INSERT INTO users (email, password, name) VALUES
-  ('generalmanager@dkitsu.com', '------------------------------------------------------------', 'Maria'),
+  ('generalmanager@dkitsu.com', '$2y$10$X8cAp501c8.oW1rlFRGdNe8UlIio8x0A6e.h6BWNpHpVrOt4V2JR.', 'Maria'),
   ('president@dkitsu.com', '------------------------------------------------------------', 'Niamh'),
   ('other@dkitsu.com', '------------------------------------------------------------', 'Mark');
 

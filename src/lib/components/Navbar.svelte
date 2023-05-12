@@ -2,11 +2,9 @@
   import { onMount } from "svelte";
   import { navigating } from "$app/stores";
 
-  import DarkMode from "./DarkMode.svelte";
+  export let authenticated: boolean;
 
-  const pages = {
-    'Log Out': "/auth/logout",
-  };
+  const pages = authenticated ? { "Log Out": "/auth/logout" } : {};
 
   onMount(async () => {
     const menu = document.getElementById("burger-menu")!;
@@ -59,9 +57,7 @@
   </div>
 
   <div class="navbar-menu">
-    <div class="navbar-start">
-      <!-- <DarkMode /> -->
-    </div>
+    <div class="navbar-start" />
 
     <div class="navbar-end">
       {#each Object.entries(pages) as [page, url]}
@@ -78,29 +74,6 @@
     padding: 8px 8px 0 8px;
   }
 
-  /* .navbar-item, */
-  /* .navbar-item:hover { */
-    /* color: var(--green); */
-    /* font-family: monospace; */
-  /* } */
-
-  /* .navbar-item::before, */
-  /* .navbar-item::after { */
-  /*   content: "\a0"; */
-  /* } */
-
-  /* .is-current-page::before, */
-  /* .navbar-item:hover::before { */
-  /*   content: "["; */
-  /* } */
-
-  /* .is-current-page::after, */
-  /* .navbar-item:hover::after { */
-  /*   content: "]"; */
-  /* } */
-
-  /* .navbar-item:not(.is-current-page):hover::before, */
-  /* .navbar-item:not(.is-current-page):hover::after { */
-  /*   color: var(--grey); */
+  /* .is-current-page { */
   /* } */
 </style>

@@ -4,6 +4,10 @@
   import Footer from "$lib/components/Footer.svelte";
 
   import '/src/global.scss';
+
+  export let data;
+
+  const authenticated: boolean = !!data.user;
 </script>
 
 <svelte:head>
@@ -13,9 +17,11 @@
   <meta name="url" content="https://dkitsu.com/" />
 </svelte:head>
 
-<Navbar />
+<Navbar authenticated={authenticated} />
 
-<Sidebar />
+{#if authenticated}
+  <Sidebar />
+{/if}
 
 <main>
   <slot />

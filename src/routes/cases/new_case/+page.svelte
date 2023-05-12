@@ -2,10 +2,12 @@
   import { onMount } from "svelte";
   import axios from "axios";
 
+  import Switch from "$lib/components/Switch.svelte";
+
   export let data;
 
-  const ASIGNEES = data.post.users;
-  const TYPES = data.post.types;
+  const assignees = data.post.users;
+  const types = data.post.types;
 
   onMount(async () => {
     document.getElementById("type")!.addEventListener("input", (e) => {
@@ -23,7 +25,7 @@
       opt.innerHTML = "&mdash;";
       subtype_select.appendChild(opt);
 
-      for (let subtype of TYPES.find((t) => t.name === (e.target as HTMLSelectElement).value).subtypes) {
+      for (let subtype of types.find((t) => t.name === (e.target as HTMLSelectElement).value).subtypes) {
         opt = document.createElement("option");
         opt.value = subtype;
         opt.textContent = subtype;
@@ -33,19 +35,23 @@
   });
 
   async function create_case() {
-    axios.post('/cases/new_case', {
-      name: (document.getElementById('name') as HTMLInputElement).value,
-      student_number: (document.getElementById('student-number') as HTMLInputElement).value,
-      type: (document.getElementById('type') as HTMLSelectElement).value,
-      subtype: (document.getElementById('subtype') as HTMLSelectElement).value,
-      description: (document.getElementById('description') as HTMLTextAreaElement).value,
-      assignee: (document.getElementById('assignee') as HTMLSelectElement).value,
-      status: (document.getElementById('status') as HTMLInputElement).value,
-    }).then((res) => {
-      console.log(res);
-    }).catch((err) => {
-      console.log(err);
-    });
+    axios
+      .post("/cases/new_case", {
+        name: (document.getElementById("name") as HTMLInputElement).value,
+        student_number: (document.getElementById("student-number") as HTMLInputElement).value,
+        type: (document.getElementById("type") as HTMLSelectElement).value,
+        subtype: (document.getElementById("subtype") as HTMLSelectElement).value,
+        description: (document.getElementById("description") as HTMLTextAreaElement).value,
+        assignee: (document.getElementById("assignee") as HTMLSelectElement).value,
+        status: (document.getElementById("status") as HTMLInputElement).checked,
+      })
+      .then((res) => {
+        console.log(res);
+        window.location.pathname = `/cases/${res.data}`;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 </script>
 
@@ -61,10 +67,14 @@
       <div class="field">
         <label for="student-number">Student number</label>
         <div class="control has-icons-left">
-          <input id="student-number" class="input" placeholder="XXXXXX" minlength="6" maxlength="6" />
-          <span class="icon is-left">
-            D00
-          </span>
+          <input
+            id="student-number"
+            class="input"
+            placeholder="XXXXXX"
+            minlength="6"
+            maxlength="6"
+          />
+          <span class="icon is-left"> D00 </span>
         </div>
       </div>
       <div class="field">
@@ -76,42 +86,58 @@
 
       <div class="field">
         <label for="assignee">Assigned to</label>
-        <select id="assignee" class="input">
-          <option selected disabled>&mdash;</option>
-          {#each ASIGNEES as assignee}
-            <option value={assignee.id}>{assignee.name}</option>
-          {/each}
-        </select>
+        <div class="select">
+          <select id="assignee">
+            <option selected disabled>&mdash;</option>
+            {#each assignees as assignee}
+              <option value={assignee.id}>{assignee.name}</option>
+            {/each}
+          </select>
+        </div>
       </div>
-      <div class="field">
-        <label for="status">Status</label><br />
-        Closed <input id="status" class="checkbox" type="checkbox" /> Open
+      <div class="field switch">
+        <Switch id="status" left="Closed" right="Open" checked />
       </div>
     </div>
 
     <div class="column">
       <div class="field">
         <label for="type">Type</label>
-        <select id="type" class="input">
-          <option selected disabled>&mdash;</option>
-          {#each TYPES as type}
-            <option value={type.name}>{type.name}</option>
-          {/each}
-        </select>
+        <div class="select">
+          <select id="type">
+            <option selected disabled>&mdash;</option>
+            {#each types as type}
+              <option value={type.name}>{type.name}</option>
+            {/each}
+          </select>
+        </div>
       </div>
       <div class="field">
         <label for="subtype">Subtype</label>
-        <select id="subtype" class="input" />
+        <div class="select">
+          <select id="subtype" />
+        </div>
       </div>
     </div>
   </div>
 
-  <button id="save" class="center button" on:click={create_case}>&nbsp;Save&nbsp;</button>
+  <button id="save" class="center button" on:click={create_case}>
+    Save
+  </button
+  >
 </article>
 
 <style>
   .field .control .icon {
     color: #363636;
     top: 0.8px;
+  }
+
+  label {
+    display: block;
+  }
+
+  select, .select {
+    width: 100%;
   }
 </style>
