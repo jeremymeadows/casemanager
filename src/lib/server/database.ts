@@ -10,4 +10,13 @@ export const db = new Client({
 
 db.connect()
 
-export const sql = {};
+export async function is_admin(session_id: string): Promise<boolean> {
+  let res = await db.query(
+    "SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
+    [session_id]
+  );
+
+  return res.rowCount !== 0 && res.rows[0].is_admin;
+}
+
+// export const sql = {};

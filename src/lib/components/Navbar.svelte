@@ -4,7 +4,7 @@
 
   export let authenticated: boolean;
 
-  const pages = authenticated ? { "Log Out": "/auth/logout" } : {};
+  const pages = authenticated ? { "Settings": "/settings", "Log Out": "/auth/logout" } : {};
 
   onMount(async () => {
     const menu = document.getElementById("burger-menu")!;

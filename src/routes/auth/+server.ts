@@ -3,10 +3,6 @@ import { db } from "$lib/server/database";
 import { user } from "$lib/utils/stores";
 import bcrypt from "bcrypt";
 
-export async function GET() {
-  return json("test");
-}
-
 export async function POST({
   request,
   cookies,
@@ -14,15 +10,19 @@ export async function POST({
   request: any;
   cookies: any;
 }) {
-  // user.set('hhhh');
-  let data = await request.json();
+  // user.set('');
+  let { email, password } = await request.json();
 
   let user = await db.query(
     "SELECT user_id, name, password FROM users WHERE email = $1",
-    [data["email"]]
+    [email]
   );
 
-  if (!(await bcrypt.compare(data["password"], user.rows[0]["password"]))) {
+  // console.log(email, password, user)
+  // console.log(await bcrypt.hash(password, await bcrypt.genSalt(10)));
+  // console.log(await bcrypt.compare(password, user.rows[0]["password"]));
+
+  if (user.rowCount === 0 || !(await bcrypt.compare(password, user.rows[0]["password"]))) {
     throw error(401, "no account with matching credentials");
   }
 
@@ -35,12 +35,6 @@ export async function POST({
   cookies.set("session", session_id, expires);
 
   return json(res.rows[0]);
-}
-
-export async function PUT() {
-  // new account
-  console.log('putting')
-  return json(true)
 }
 
 export async function DELETE({ cookies }: { cookies: any }) {

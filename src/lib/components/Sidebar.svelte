@@ -1,9 +1,7 @@
 <script lang="ts">
 </script>
 
-<ul
-  id="sidebar"
->
+<ul id="sidebar">
   <li>
     <a href="/">Dashboard</a>
   </li>
@@ -19,6 +17,10 @@
 
   <li>
     <a href="/404">Reports</a>
+  </li>
+
+  <li>
+    <a href="/admin">Admin</a>
   </li>
 </ul>
 

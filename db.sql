@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   user_id SERIAL NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
-  password VARCHAR(60) NOT NULL,
+  password VARCHAR(60),
   name VARCHAR(32) NOT NULL,
   is_admin BOOLEAN NOT NULL DEFAULT FALSE;
   PRIMARY KEY (user_id)
@@ -42,10 +42,10 @@ CREATE TABLE cases (
 );
 
 
-INSERT INTO users (email, password, name) VALUES
-  ('generalmanager@dkitsu.com', '$2y$10$X8cAp501c8.oW1rlFRGdNe8UlIio8x0A6e.h6BWNpHpVrOt4V2JR.', 'Maria'),
-  ('president@dkitsu.com', '------------------------------------------------------------', 'Niamh'),
-  ('other@dkitsu.com', '------------------------------------------------------------', 'Mark');
+INSERT INTO users (email, name) VALUES
+  ('generalmanager@dkitsu.ie', 'Maria'),
+  ('president@dkitsu.ie', 'Niamh'),
+  ('engagement@dkitsu.ie', 'Eddie');
 
 INSERT INTO types (name, subtype) VALUES
   ('Accomodation', 'International'),
