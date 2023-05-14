@@ -1,14 +1,26 @@
-import { Client } from 'pg';
+import { error } from "@sveltejs/kit";
+import { Client } from "pg";
 
 export const db = new Client({
-  host: '192.0.0.9',
-  user: 'root',
-  password: 'toor',
-  database: 'dkitsu',
+  host: "192.0.0.9",
+  user: "root",
+  password: "toor",
+  database: "dkitsu",
   port: 5432,
-})
+});
 
-db.connect()
+db.connect().catch(() => {
+  error(500, "failed to establish database connection");
+});
+
+export async function get_user(session_id: string): Promise<{ user_id: number, email: string, name: string }> {
+  let res = await db.query(
+    "SELECT user_id, email, name FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
+    [session_id]
+  )
+
+  return res.rows[0];
+}
 
 export async function is_admin(session_id: string): Promise<boolean> {
   let res = await db.query(
@@ -18,5 +30,3 @@ export async function is_admin(session_id: string): Promise<boolean> {
 
   return res.rowCount !== 0 && res.rows[0].is_admin;
 }
-
-// export const sql = {};

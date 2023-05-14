@@ -1,6 +1,5 @@
 import { json, error } from "@sveltejs/kit";
 import { db } from "$lib/server/database";
-import { user } from "$lib/utils/stores";
 import bcrypt from "bcrypt";
 
 export async function POST({
@@ -10,17 +9,12 @@ export async function POST({
   request: any;
   cookies: any;
 }) {
-  // user.set('');
   let { email, password } = await request.json();
 
   let user = await db.query(
     "SELECT user_id, name, password FROM users WHERE email = $1",
     [email]
   );
-
-  // console.log(email, password, user)
-  // console.log(await bcrypt.hash(password, await bcrypt.genSalt(10)));
-  // console.log(await bcrypt.compare(password, user.rows[0]["password"]));
 
   if (user.rowCount === 0 || !(await bcrypt.compare(password, user.rows[0]["password"]))) {
     throw error(401, "no account with matching credentials");
@@ -42,7 +36,6 @@ export async function DELETE({ cookies }: { cookies: any }) {
 
   await db.query("DELETE FROM sessions WHERE session_id = $1", [session_id]);
   cookies.delete("session");
-  user.set(null);
 
   return json(true);
 }

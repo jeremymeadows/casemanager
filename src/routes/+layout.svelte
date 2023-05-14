@@ -7,7 +7,7 @@
 
   export let data;
 
-  const authenticated: boolean = !!data.user;
+  const user: { user_id: number, email: string, name: string } = data.user;
 </script>
 
 <svelte:head>
@@ -17,9 +17,9 @@
   <meta name="url" content="https://dkitsu.com/" />
 </svelte:head>
 
-<Navbar authenticated={authenticated} />
+<Navbar user={user} />
 
-{#if authenticated}
+{#if user}
   <Sidebar />
 {/if}
 

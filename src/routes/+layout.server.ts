@@ -1,7 +1,5 @@
-import { get } from "svelte/store";
 import { redirect } from "@sveltejs/kit";
 import { db } from "$lib/server/database";
-import { user } from "$lib/utils/stores";
 
 export const prerender = true;
 
@@ -16,11 +14,12 @@ export async function load({
   const url = new URL(request.url).pathname;
 
   let res = await db.query(
-    "SELECT user_id, name, email FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
-    [session_id]
+    "SELECT user_id, email, name FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
+    [/^([a-zA-Z0-9]){8}-(([a-zA-Z0-9]){4}-){3}([a-zA-Z0-9]){12}$/.test(session_id) ? session_id : null]
   );
+
   if (res.rowCount === 0) {
-    user.set(null);
+    cookies.delete("session");
 
     if (url !== "/auth/login") {
       throw redirect(307, "/auth/login");
@@ -29,9 +28,7 @@ export async function load({
     throw redirect(307, "/");
   }
 
-  user.set(res.rows[0]);
-
   return {
-    user: get(user),
+    user: res.rows[0],
   };
 }

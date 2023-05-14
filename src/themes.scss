@@ -3,7 +3,8 @@
 :root,
 html[theme='light'] {
   --fg: #{$black};
-  --bg: #{$white};
+  // --bg: #{$white};
+  --bg: white;
   --bg-alt: #{$white-darker};
   // --primary: #{$primary};
   --green: green;

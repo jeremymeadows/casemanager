@@ -4,36 +4,30 @@
   export let data;
 
   const users = data.users;
-  let edit_mode = false;
+  let edit_id = "";
 
   function edit(event: MouseEvent) {
-    let id = (event.target as HTMLButtonElement).getAttribute("data-for")!;
-
-    document.getElementById(id)!.hidden = true;
-    document.getElementById(`${id}-edit`)!.hidden = false;
-    edit_mode = true;
+    edit_id = (event.target as HTMLButtonElement).getAttribute("data-for")!;
+    document.getElementById(edit_id)!.hidden = true;
+    document.getElementById(`${edit_id}-edit`)!.hidden = false;
   }
 
-  function cancel(event: MouseEvent) {
-    let id = (event.target as HTMLButtonElement).getAttribute("data-for")!;
-
-    document.getElementById(id)!.hidden = false;
-    document.getElementById(`${id}-edit`)!.hidden = true;
-    edit_mode = false;
+  function cancel() {
+    document.getElementById(edit_id)!.hidden = false;
+    document.getElementById(`${edit_id}-edit`)!.hidden = true;
+    edit_id = "";
   }
 
-  function save(event: MouseEvent) {
-    let id = (event.target as HTMLButtonElement).getAttribute("data-for")!;
-
-    document.getElementById(id)!.hidden = false;
-    document.getElementById(`${id}-edit`)!.hidden = true;
+  function save() {
+    document.getElementById(edit_id)!.hidden = false;
+    document.getElementById(`${edit_id}-edit`)!.hidden = true;
 
     axios
       .put("/admin/users", {
-        user_id: id,
-        name: (document.getElementById(`${id}-name`) as HTMLInputElement).value,
-        email: (document.getElementById(`${id}-email`) as HTMLInputElement).value,
-        admin: (document.getElementById(`${id}-admin`) as HTMLInputElement).checked,
+        user_id: edit_id,
+        name: (document.getElementById(`${edit_id}-name`) as HTMLInputElement).value,
+        email: (document.getElementById(`${edit_id}-email`) as HTMLInputElement).value,
+        admin: (document.getElementById(`${edit_id}-admin`) as HTMLInputElement).checked,
       })
       .then((_res: any) => {
         document.location.reload();
@@ -43,18 +37,21 @@
       });
   }
 
-  function reset_password(event: MouseEvent) {
-    let id = (event.target as HTMLButtonElement).getAttribute("data-for")!;
-
+  function reset_password() {
     axios
       .patch("/admin/users", {
-        user_id: id,
+        user_id: edit_id,
       })
       .then((res: any) => {
-        console.log(res);
-        document.getElementById('password-email')!.textContent = res.data.email;
+        let link = document.createElement('a');
+        link.textContent = res.data.email;
+
+        let message = `subject=Your Password has been Reset&body=Your password has been reset to: <code style="font-size: 1.5em; font-weight: bold;">${res.data.password}</code>`;
+        link.href = `mailto:${res.data.email}?${encodeURI(message)}`;
+
+        document.getElementById('password-email')!.replaceChildren(link);
         document.getElementById('password')!.textContent = res.data.password;
-        document.querySelector('dialog')!.showModal();
+        (document.getElementById('new-password')! as HTMLDialogElement).showModal();
       })
       .catch((err: any) => {
         console.log(err);
@@ -62,13 +59,13 @@
   }
 
   function add() {
-    edit_mode = true;
+    edit_id = "-1";
     document.getElementById('add')!.hidden = false;
   }
 
   function add_cancel() {
-    edit_mode = false;
     document.getElementById('add')!.hidden = true;
+    edit_id = "";
   }
 
   function add_save() {
@@ -105,7 +102,8 @@
             <td><a href="mailto:{user.email}">{user.email}</a></td>
             <td>{user.is_admin ? "Administrator" : "Normal"}</td>
             <td>
-              <span hidden={edit_mode}>
+              <button class="button is-small invis">&nbsp</button>
+              <span hidden={!!edit_id}>
                 <button
                   class="button is-small is-info"
                   data-for={user.user_id}
@@ -126,21 +124,18 @@
             <td>
               <button
                 class="button is-small is-success"
-                data-for={user.user_id}
                 on:click={save}
               >
                 Save
               </button>
               <button
                 class="button is-small is-danger"
-                data-for={user.user_id}
-                on:click={reset_password}
+                on:click={() => document.getElementById('password-confirm').showModal()}
               >
                 Reset<br />Password
               </button>
               <button
                 class="button is-small is-warning"
-                data-for={user.user_id}
                 on:click={cancel}
               >
                 Cancel
@@ -173,13 +168,34 @@
       </tbody>
     </table>
 
-    <button class="button" on:click={add} disabled={edit_mode}>Add User</button>
-    <button class="button" on:click={() => document.querySelector('dialog')?.showModal()}>Test</button>
+    <button class="button" on:click={add} disabled={!!edit_id}>Add User</button>
 
-    <dialog class="dialog">
+    <dialog id="password-confirm">
+      <h2>Are you sure you want to reset the password?</h2>
+      <br />
+      <div class="center">
+        <button
+          class="button"
+          on:click={() => document.getElementById('password-confirm')?.close()}
+        >
+          Cancel
+        </button>
+        <button
+          class="button is-danger"
+          on:click={() => {
+            document.getElementById('password-confirm')?.close();
+            reset_password();
+          }}
+        >
+        Reset
+        </button>
+      </div>
+    </dialog>
+
+    <dialog id="new-password">
       <p>The new password for <span id="password-email" /> is <code id="password" /></p>
       <br />
-      <button class="button center" on:click={() => document.querySelector('dialog')?.close()}>OK</button>
+      <button class="button center" on:click={() => document.getElementById('new-password')?.close()}>Close</button>
     </dialog>
   </section>
 </article>
@@ -187,6 +203,7 @@
 <style lang="scss">
   table {
     width: 100%;
+    background-color: var(--bg);
   }
 
   th:nth-child(1) {
@@ -197,20 +214,30 @@
     width: 40%
   }
 
-  tr, td, td input {
-    height: 1.8em;
-  }
-
   tr:hover {
     background-color: var(--bg-alt);
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  td input.input {
+    height: calc(1.9em - 1px);
   }
 
   button {
     line-height: 1em;
   }
 
+  .invis {
+    visibility: hidden;
+    width: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   dialog {
-    /* background-color: var(--bg-alt); */
     border-color: var(--grey);
     border-radius: 5px;
     top: -33%;

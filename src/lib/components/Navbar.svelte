@@ -2,9 +2,9 @@
   import { onMount } from "svelte";
   import { navigating } from "$app/stores";
 
-  export let authenticated: boolean;
+  export let user: { email: string, name: string };
 
-  const pages = authenticated ? { "Settings": "/settings", "Log Out": "/auth/logout" } : {};
+  // const pages = user ? { "Settings": "/settings", "Log Out": "/auth/logout" } : {};
 
   onMount(async () => {
     const menu = document.getElementById("burger-menu")!;
@@ -60,9 +60,26 @@
     <div class="navbar-start" />
 
     <div class="navbar-end">
-      {#each Object.entries(pages) as [page, url]}
-        <a href={url} class="navbar-item">{page}</a>
-      {/each}
+      {#if user}
+        <div class="navbar-item has-dropdown is-hoverable">
+          <span class="navbar-link">
+            {user.name}
+          </span>
+          <div class="navbar-dropdown">
+            <a href="/settings" class="navbar-item">
+              Account Settings
+            </a>
+            <a href="/auth/logout" class="navbar-item">
+              Log Out
+            </a>
+          </div>
+        </div>
+        <!-- {#each Object.entries(pages) as [page, url]} -->
+        <!--   <a href={url} class="navbar-item">{page}</a> -->
+        <!-- {/each} -->
+      <!-- {:else} -->
+      <!--   <a href="/auth/login" class="navbar-item">Log In</a> -->
+      {/if}
     </div>
   </div>
 </nav>
@@ -72,6 +89,10 @@
     margin: -8px;
     margin-bottom: 100%;
     padding: 8px 8px 0 8px;
+  }
+
+  .navbar-end .navbar-dropdown {
+    left: -5em;
   }
 
   /* .is-current-page { */

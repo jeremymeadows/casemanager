@@ -1,5 +1,5 @@
 import { json, error } from "@sveltejs/kit";
-import { db, is_admin } from "$lib/server/database";
+import { db, get_user, is_admin } from "$lib/server/database";
 import bcrypt from "bcrypt";
 
 // sets a user's account details
@@ -27,7 +27,7 @@ export async function PUT({
   return json(true);
 }
 
-// reset password
+// reset/change password
 export async function PATCH({
   request,
   cookies,
@@ -38,13 +38,26 @@ export async function PATCH({
   const session_id = cookies.get("session");
 
   let data = await request.json();
-  let { user_id } = data;
+  let { user_id, password } = data;
 
-  if (!(await is_admin(session_id))) {
-    throw error(403, "cannot modify user accounts");
+  if (user_id) {
+    if (!(await is_admin(session_id))) {
+      throw error(403, "cannot modify user accounts");
+    }
+  } else {
+    user_id = (await get_user(session_id)).user_id;
+
+    let res = await db.query(
+      "SELECT password FROM users WHERE user_id = $1",
+      [user_id]
+    );
+
+    if (!(await bcrypt.compare(data.old_password, res.rows[0]["password"]))) {
+      throw error(403, "incorrect password");
+    }
   }
 
-  let password = Array(10)
+  password ??= Array(8)
     .fill(null)
     .map((_) =>
       ((Math.random() * 36) | 0)
