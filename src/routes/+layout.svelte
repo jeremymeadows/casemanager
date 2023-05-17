@@ -3,11 +3,16 @@
   import Sidebar from "$lib/components/Sidebar.svelte";
   import Footer from "$lib/components/Footer.svelte";
 
-  import '/src/global.scss';
+  import "/src/global.scss";
 
   export let data;
 
-  const user: { user_id: number, email: string, name: string } = data.user;
+  const user: {
+    user_id: number;
+    email: string;
+    name: string;
+    is_admin: boolean;
+  } = data.user;
 </script>
 
 <svelte:head>
@@ -17,10 +22,10 @@
   <meta name="url" content="https://dkitsu.com/" />
 </svelte:head>
 
-<Navbar user={user} />
+<Navbar {user} />
 
 {#if user}
-  <Sidebar />
+  <Sidebar admin={user.is_admin} />
 {/if}
 
 <main>

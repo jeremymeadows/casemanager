@@ -14,8 +14,16 @@ export async function load({
   const url = new URL(request.url).pathname;
 
   let res = await db.query(
-    "SELECT user_id, email, name FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
+    "SELECT user_id, email, name, is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
     [/^([a-zA-Z0-9]){8}-(([a-zA-Z0-9]){4}-){3}([a-zA-Z0-9]){12}$/.test(session_id) ? session_id : null]
+  );
+
+  let users = await db.query(
+    "SELECT user_id, CONCAT(name, ' <', email, '>') as name FROM users"
+  );
+
+  let types = await db.query(
+    "SELECT name, STRING_AGG(subtype, ';') as subtypes FROM types GROUP BY name"
   );
 
   if (res.rowCount === 0) {
@@ -30,5 +38,7 @@ export async function load({
 
   return {
     user: res.rows[0],
+    users: users.rows,
+    types: types.rows.reduce((acc, val) => (acc[val.name] = val.subtypes.split(';'), acc), {}),
   };
 }

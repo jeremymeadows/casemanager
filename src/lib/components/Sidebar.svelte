@@ -1,4 +1,5 @@
 <script lang="ts">
+  export let admin: boolean;
 </script>
 
 <ul id="sidebar">
@@ -10,7 +11,7 @@
     <a href="/cases">Cases</a>
     <ul>
       <li>
-        <a href="/cases/new_case">New Case</a>
+        <a href="/cases/new">New Case</a>
       </li>
     </ul>
   </li>
@@ -19,9 +20,11 @@
     <a href="/404">Reports</a>
   </li>
 
-  <li>
-    <a href="/admin">Admin</a>
-  </li>
+  {#if admin}
+    <li>
+      <a href="/admin">Admin</a>
+    </li>
+  {/if}
 </ul>
 
 <style lang="scss">

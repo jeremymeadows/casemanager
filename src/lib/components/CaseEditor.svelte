@@ -4,10 +4,21 @@
 
   import Switch from "$lib/components/Switch.svelte";
 
+  // export let data: { case: any, users: any, types: any };
   export let data;
+  // {
+  //   name: string,
+  //   student_number: string,
+  //   type: string,
+  //   subtype: string,
+  //   description: string,
+  //   assignee: string,
+  //   is_open: boolean,
+  // };
 
-  const assignees = data.post.users;
-  const types = data.post.types;
+  const assignees = data.users;
+  const types = data.types;
+  const case = data.case;
 
   onMount(async () => {
     document.getElementById("type")!.addEventListener("input", (e) => {
@@ -123,8 +134,7 @@
 
   <button id="save" class="center button" on:click={create_case}>
     Save
-  </button
-  >
+  </button>
 </article>
 
 <style>

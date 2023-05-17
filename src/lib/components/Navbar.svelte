@@ -4,8 +4,6 @@
 
   export let user: { email: string, name: string };
 
-  // const pages = user ? { "Settings": "/settings", "Log Out": "/auth/logout" } : {};
-
   onMount(async () => {
     const menu = document.getElementById("burger-menu")!;
     menu.addEventListener("click", () => {
