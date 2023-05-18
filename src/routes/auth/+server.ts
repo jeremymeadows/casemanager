@@ -26,7 +26,7 @@ export async function POST({
   );
   let { session_id, expires } = res.rows[0];
 
-  cookies.set("session", session_id, expires);
+  cookies.set("session", session_id, { expires: new Date(expires) });
 
   return json(res.rows[0]);
 }
