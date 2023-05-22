@@ -13,13 +13,14 @@ export async function load({ cookies }: { cookies: any }) {
         created,
         users.name as assignee
       FROM cases
-      JOIN users ON cases.assignee = users.user_id
+      LEFT JOIN users ON cases.assignee = users.user_id
       WHERE
         CASE
           WHEN (SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1)
             THEN TRUE
-            ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1)
+          ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1)
         END
+      ORDER BY is_open DESC, created
       `,
     [session_id]
   );

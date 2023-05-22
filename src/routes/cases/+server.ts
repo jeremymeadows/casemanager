@@ -3,6 +3,7 @@ import { db } from "$lib/server/database";
 
 export async function POST({ request }: { request: any }) {
   const data = await request.json();
+  console.log(data)
 
   let res = await db.query(
     `

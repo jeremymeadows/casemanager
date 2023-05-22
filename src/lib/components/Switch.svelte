@@ -5,16 +5,18 @@
   export let checked: boolean = false;
 </script>
 
-<div>
+<span>
   {left || "off"}
   <label class="switch">
     <input id={id} type="checkbox" {checked} />
     <span class="slider" />
   </label>
   {right || "on"}
-</div>
+</span>
 
 <style lang="scss">
+  @import "../../variables.scss";
+
   label {
     position: relative;
     display: inline-block;
@@ -36,7 +38,7 @@
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    border-radius: 5px ;
+    border-radius: 4px ;
     transition: background-color 0.4s;
   }
 
@@ -48,12 +50,16 @@
     left: 4px;
     bottom: 4px;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 4px;
     transition: background-color 0.4s;
   }
 
+  /* label span.is-rounded, label span.is-rounded::before { */
+  /*   border-radius: 9999px; */
+  /* } */
+
   input:checked + span {
-    background-color: var(--blue);
+    background-color: $primary;
   }
 
   input:focus + span {

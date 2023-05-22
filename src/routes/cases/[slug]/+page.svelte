@@ -33,13 +33,17 @@
   }
 
   function get_case() {
+    let type = (document.getElementById("type") as HTMLSelectElement).value;
+    let subtype = (document.getElementById("subtype") as HTMLSelectElement).value;
+    let assignee = (document.getElementById("assignee") as HTMLSelectElement).value;
+
     return {
       name: (document.getElementById("name") as HTMLInputElement).value,
       student_number: (document.getElementById("student-number") as HTMLInputElement).value,
-      type: (document.getElementById("type") as HTMLSelectElement).value,
-      subtype: (document.getElementById("subtype") as HTMLSelectElement).value,
+      type: type ? type : null,
+      subtype: subtype ? subtype : null,
       description: (document.getElementById("description") as HTMLTextAreaElement).value,
-      assignee: (document.getElementById("assignee") as HTMLSelectElement).value,
+      assignee: assignee ? assignee : null,
       status: (document.getElementById("status") as HTMLInputElement).checked,
     };
   }
@@ -72,7 +76,7 @@
 </script>
 
 <article>
-  <a class="button" href="/cases">&lt; Back</a>
+  <a id="back" class="button is-small" href="/cases"><i class='bx bx-chevron-left' ></i> Back</a>
 
   <h1>{data.case ? `Case #${data.case.case_id}` : 'New Case'}</h1>
 
@@ -120,22 +124,14 @@
         {#if edit}
           <div class="select">
             <select id="assignee">
-              <option>Unassigned</option>
+              <option value="">Unassigned</option>
               {#each data.users as assignee}
-                <option value={assignee.user_id} selected={assignee.user_id === data.case?.assignee}>{assignee.name}</option>
+                <option value={assignee.user_id} selected={assignee.user_id === data.case?.assignee}>{`${assignee.name} <${assignee.email}>`}</option>
               {/each}
             </select>
           </div>
         {:else}
-          <div>{data.case.assignee}</div>
-        {/if}
-      </div>
-      <div class="field switch">
-        <label for="">Status</label>
-        {#if edit}
-          <Switch id="status" left="Closed" right="Open" checked={data.case?.is_open ?? true} />
-        {:else}
-          <div>{data.case.is_open ? 'Open' : 'Closed'}</div>
+          <div>{data.case.assignee_name ?? 'Unassigned'}</div>
         {/if}
       </div>
       {#if data.case}
@@ -152,14 +148,14 @@
         {#if edit}
           <div class="select">
             <select id="type" on:change={swap_subtypes}>
-              <option selected disabled>&mdash;</option>
+              <option value="" selected disabled>&mdash;</option>
               {#each Object.keys(data.types) as type}
                 <option value={type} selected={type == data.case?.type}>{type}</option>
               {/each}
             </select>
           </div>
         {:else}
-          <div>{data.case.type}</div>
+          <div>{data.case.type ?? 'None'}</div>
         {/if}
       </div>
       <div class="field">
@@ -167,13 +163,24 @@
         {#if edit}
           <div class="select">
             <select id="subtype">
-              {#each data.types[data.case?.type] as subtype}
+              {#each data.case && data.case.type ? data.types[data.case.type] : [] as subtype}
                 <option value={subtype} selected={subtype == data.case?.subtype}>{subtype}</option>
               {/each}
             </select>
           </div>
         {:else}
-          <div>{data.case.subtype}</div>
+          <div>{data.case.subtype ?? 'None'}</div>
+        {/if}
+      </div>
+
+      <br />
+
+      <div class="field switch">
+        <label for="">Status</label>
+        {#if edit}
+          <Switch id="status" left="Closed" right="Open" checked={data.case?.is_open ?? true} />
+        {:else}
+          <div>{data.case.is_open ? 'Open' : 'Closed'}</div>
         {/if}
       </div>
     </div>
@@ -208,7 +215,7 @@
     {:else}
       <button
         id="edit"
-        class="center button"
+        class="center button is-info"
         on:click={() => edit = true}
       >
         Edit
@@ -218,6 +225,11 @@
 </article>
 
 <style>
+  #back {
+    position: absolute;
+    transform: translate(-2rem, -2rem);
+  }
+
   .field .control .icon {
     color: #363636;
     top: 0.8px;
@@ -225,6 +237,7 @@
 
   label {
     display: block;
+    font-weight: bold;
   }
 
   select, .select {

@@ -87,7 +87,7 @@ a[href^="http"][target="_blank"]:hover::after {
     font-weight: bold;
 }
 
-aside {
+aside:not(.menu) {
   color: var(--grey);
   font-style: italic;
   font-size: 0.8em;

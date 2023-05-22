@@ -12,15 +12,16 @@ export async function load({ params }: { params: { slug: number | "new" } }) {
     `
       SELECT
         case_id,
-        cases.name as name,
+        cases.name AS name,
         student_number,
         description,
         type,
         subtype,
-        users.name as assignee,
+        assignee,
+        users.name AS assignee_name,
         is_open
       FROM cases
-      JOIN users ON cases.assignee = users.user_id
+      LEFT JOIN users ON cases.assignee = users.user_id
       WHERE case_id = $1
     `,
     [params.slug]

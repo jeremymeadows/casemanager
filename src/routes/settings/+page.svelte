@@ -1,6 +1,8 @@
 <script lang="ts">
   import axios from "axios";
 
+  export let data;
+
   function logout_all() {
 
   }
@@ -60,7 +62,7 @@
 </script>
 
 <article>
-  <h1>Settings<aside>email goes here</aside></h1>
+  <h1>Settings<aside>{data.user.email}</aside></h1>
   <br /><br />
 
   <div id="message" hidden>
@@ -110,5 +112,9 @@
   .narrow {
     max-width: 50%;
     margin: auto;
+  }
+
+  h1 aside {
+    font-size: 0.6em;
   }
 </style>

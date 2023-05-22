@@ -122,24 +122,26 @@
               <input id="{user.user_id}-admin" type="checkbox" checked={user.is_admin} />
             </td>
             <td>
-              <button
-                class="button is-small is-success"
-                on:click={save}
-              >
-                Save
-              </button>
-              <button
-                class="button is-small is-danger"
-                on:click={() => document.getElementById('password-confirm').showModal()}
-              >
-                Reset<br />Password
-              </button>
-              <button
-                class="button is-small is-warning"
-                on:click={cancel}
-              >
-                Cancel
-              </button>
+              <div class="buttons has-addons">
+                <button
+                  class="button is-small is-success"
+                  on:click={save}
+                >
+                  Save
+                </button>
+                <button
+                  class="button is-small is-danger"
+                  on:click={() => document.getElementById('password-confirm').showModal()}
+                >
+                  Reset<br />Password
+                </button>
+                <button
+                  class="button is-small is-warning"
+                  on:click={cancel}
+                >
+                  Cancel
+                </button>
+              </div>
             </td>
           </tr>
         {/each}

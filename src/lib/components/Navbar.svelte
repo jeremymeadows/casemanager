@@ -89,6 +89,10 @@
     padding: 8px 8px 0 8px;
   }
 
+  nav .navbar-brand .navbar-item {
+    font-weight: bold;
+  }
+
   .navbar-end .navbar-dropdown {
     left: -5em;
   }

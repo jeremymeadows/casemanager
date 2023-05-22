@@ -2,6 +2,30 @@ import { json, error } from "@sveltejs/kit";
 import { db, get_user, is_admin } from "$lib/server/database";
 import bcrypt from "bcrypt";
 
+// new account
+export async function POST({
+  request,
+  cookies,
+}: {
+  request: any;
+  cookies: any;
+}) {
+  const session_id = cookies.get("session");
+
+  if (!(await is_admin(session_id))) {
+    throw error(403, "cannot modify user accounts");
+  }
+
+  let { name, email, admin } = await request.json();
+
+  let res = await db.query(
+    "INSERT INTO users (name, email, is_admin) VALUES ($1, $2, $3) RETURNING user_id",
+    [name, email, admin]
+  );
+
+  return json(res.rows[0].user_id);
+}
+
 // sets a user's account details
 export async function PUT({
   request,
@@ -12,12 +36,12 @@ export async function PUT({
 }) {
   const session_id = cookies.get("session");
 
-  let data = await request.json();
-  let { user_id, name, email, admin } = data;
-
   if (!(await is_admin(session_id))) {
     throw error(403, "cannot modify user accounts");
   }
+
+  let data = await request.json();
+  let { user_id, name, email, admin } = data;
 
   await db.query(
     "UPDATE users SET name = $1, email = $2, is_admin = $3 WHERE user_id = $4",
@@ -82,7 +106,7 @@ export async function PATCH({
 }
 
 // new account
-export async function POST({
+export async function DELETE({
   request,
   cookies,
 }: {
@@ -91,16 +115,16 @@ export async function POST({
 }) {
   const session_id = cookies.get("session");
 
-  let { name, email, admin } = await request.json();
-
   if (!(await is_admin(session_id))) {
     throw error(403, "cannot modify user accounts");
   }
 
-  let res = await db.query(
-    "INSERT INTO USERS (name, email, is_admin) VALUES ($1, $2, $3) RETURNING user_id",
-    [name, email, admin]
+  let { user_id } = await request.json();
+
+  await db.query(
+    "DELETE FROM users WHERE user_id = $1",
+    [user_id]
   );
 
-  return json(res.rows[0].user_id);
+  return json(true);
 }

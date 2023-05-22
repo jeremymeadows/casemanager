@@ -19,7 +19,7 @@ export async function load({
   );
 
   let users = await db.query(
-    "SELECT user_id, CONCAT(name, ' <', email, '>') as name FROM users"
+    "SELECT user_id, name, email FROM users"
   );
 
   let types = await db.query(
