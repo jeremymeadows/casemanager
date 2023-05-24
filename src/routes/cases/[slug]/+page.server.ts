@@ -19,7 +19,9 @@ export async function load({ params }: { params: { slug: number | "new" } }) {
         subtype,
         assignee,
         users.name AS assignee_name,
-        is_open
+        is_open,
+        created,
+        closed
       FROM cases
       LEFT JOIN users ON cases.assignee = users.user_id
       WHERE case_id = $1

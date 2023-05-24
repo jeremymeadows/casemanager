@@ -1,8 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { db } from "$lib/server/database";
 
-export const prerender = true;
-
 export async function load({
   request,
   cookies,
@@ -23,7 +21,7 @@ export async function load({
   );
 
   let types = await db.query(
-    "SELECT name, STRING_AGG(subtype, ';') as subtypes FROM types GROUP BY name"
+    "SELECT parent as name, STRING_AGG(name, ';') as subtypes FROM subtypes GROUP BY parent"
   );
 
   if (res.rowCount === 0) {

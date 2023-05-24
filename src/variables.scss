@@ -6,7 +6,11 @@ $button-padding-vertical: 0.2em;
 
 @import "bulma/sass/utilities/initial-variables.sass";
 
-$primary: red;
+$primary: #13A6EB;
+$secondary: #334692;
+$accent: #DD1149;
+
+$link: $secondary;
 
 // foreground
 // $white: #f1f1f1;

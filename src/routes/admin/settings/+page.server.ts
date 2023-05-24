@@ -5,7 +5,7 @@ export async function load({ cookies }: { cookies: any }) {
   const session_id = cookies.get("session");
 
   if (!(await is_admin(session_id))) {
-    throw error(403, "cannot access user data");
+    throw error(403, "cannot access admin settings");
   }
 
   let users = await db.query(

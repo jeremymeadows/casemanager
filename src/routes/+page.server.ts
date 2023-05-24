@@ -12,6 +12,7 @@ export async function load({ cookies }: { cookies: any }) {
         is_open,
         type,
         created,
+        closed,
         users.name as assignee
       FROM cases
       LEFT JOIN users ON cases.assignee = users.user_id

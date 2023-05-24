@@ -70,19 +70,19 @@ a[href^="http"][target="_blank"] {
   display: inline-flex;
 }
 
-a[href^="http"][target="_blank"]::after {
-  content: url("icons/bx-link-external.svg");
-  transform: scale(0.5) translate(-0.2em, -0.5em);
-  max-height: 1em;
-  max-width: 0.8em;
-}
+// a[href^="http"][target="_blank"]::after {
+//   content: url("icons/bx-link-external.svg");
+//   transform: scale(0.5) translate(-0.2em, -0.5em);
+//   max-height: 1em;
+//   max-width: 0.8em;
+// }
 
 a[href^="http"][target="_blank"]:hover::after {
   filter: var(--grey-filter);
 }
 
 .field:has(input[required], textarea[required]) label::after {
-    color: var(--red);
+    color: var(--accent);
     content: '\a0*';
     font-weight: bold;
 }

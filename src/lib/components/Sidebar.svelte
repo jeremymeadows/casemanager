@@ -25,14 +25,14 @@
   </ul>
   <p class="menu-label">Cases</p>
   <ul class="menu-list">
-    <li><a href="/cases">All Cases</a></li>
+    <li><a href="/cases/all">All Cases</a></li>
     <li><a href="/cases/new">New Case</a></li>
   </ul>
   {#if admin}
     <p class="menu-label">Administration</p>
     <ul class="menu-list">
-      <li><a href="/404">Reports</a></li>
-      <li><a href="/admin">Users</a></li>
+      <li><a href="/admin/reports">Reports</a></li>
+      <li><a href="/admin/users">Users</a></li>
       <li><a href="/admin/settings">Settings</a></li>
     </ul>
   {/if}

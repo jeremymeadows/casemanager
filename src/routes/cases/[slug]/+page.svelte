@@ -18,6 +18,7 @@
     subtype_select.classList.add("input");
 
     let opt = document.createElement("option");
+    opt.value = "";
     opt.selected = true;
     opt.disabled = true;
     opt.innerHTML = "&mdash;";
@@ -44,16 +45,16 @@
       subtype: subtype ? subtype : null,
       description: (document.getElementById("description") as HTMLTextAreaElement).value,
       assignee: assignee ? assignee : null,
-      status: (document.getElementById("status") as HTMLInputElement).checked,
+      is_open: (document.getElementById("status") as HTMLInputElement).checked,
     };
   }
 
   async function create_case() {
     axios
-      .post("/cases", get_case())
+      .post("/api/cases", get_case())
       .then((res) => {
         console.log(res);
-        window.location.pathname = `/cases/${res.data}`;
+        window.location.pathname = `/api/cases/${res.data}`;
       })
       .catch((err) => {
         console.log(err);
@@ -61,10 +62,20 @@
   }
 
   async function save_case() {
+    let new_case = get_case();
+    let closed = null;
+
+    if (data.case.is_open && !new_case.is_open) {
+      closed = new Date();
+    } else if (!data.case.is_open) {
+      closed = data.case.closed;
+    }
+
     axios
-      .put("/cases", {
+      .put("/api/cases", {
         case_id: data.case.case_id,
-        ...get_case(),
+        closed: closed,
+        ...new_case
       })
       .then((res) => {
         console.log(res);
@@ -76,7 +87,7 @@
 </script>
 
 <article>
-  <a id="back" class="button is-small" href="/cases"><i class='bx bx-chevron-left' ></i> Back</a>
+  <a id="back" class="button is-small" href="/cases/all"><i class='bx bx-chevron-left' ></i> Back</a>
 
   <h1>{data.case ? `Case #${data.case.case_id}` : 'New Case'}</h1>
 
@@ -135,10 +146,18 @@
         {/if}
       </div>
       {#if data.case}
-        <div class="field switch">
-          <label for="">Created</label>
-          <div>{dtfmt('dd mmmm yyyy', data.case?.created)}</div>
-        </div>
+        <div class="columns">
+          <div class="field column">
+            <label for="">Created</label>
+            <div>{dtfmt('dd mmmm yyyy', data.case.created)}</div>
+          </div>
+          {#if !data.case.is_open}
+            <div class="field column">
+              <label for="">Closed</label>
+              <div>{dtfmt('dd mmmm yyyy', data.case.closed)}</div>
+            </div>
+          {/if}
+          </div>
       {/if}
     </div>
 
@@ -175,8 +194,26 @@
 
       <br />
 
-      <div class="field switch">
-        <label for="">Status</label>
+      <div class="field">
+        <label for="contact-method">Contact Method</label>
+        {#if edit}
+          <div class="select">
+            <select id="contact-method">
+              <option value="" selected>&mdash;<option>
+              <option value="email">Email</option>
+              <option value="phone">Phone</option>
+              <option value="person">In-Person</option>
+            </select>
+          </div>
+        {:else}
+          <div>todo</div>
+        {/if}
+      </div>
+
+      <br />
+
+      <div class="field">
+        <label for="status">Status</label>
         {#if edit}
           <Switch id="status" left="Closed" right="Open" checked={data.case?.is_open ?? true} />
         {:else}

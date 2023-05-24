@@ -4,7 +4,7 @@
 
   onMount(() => {
     axios
-      .delete("/auth")
+      .delete("/api/auth")
       .then((_res) => {
         window.location.href = "/auth/login";
       })

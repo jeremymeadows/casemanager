@@ -11,7 +11,7 @@
     let password = (form.querySelector("#password")! as HTMLInputElement).value;
 
     axios
-      .post("/auth", {
+      .post("/api/auth", {
         email: email,
         password: password,
       })

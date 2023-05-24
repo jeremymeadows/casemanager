@@ -23,7 +23,7 @@
     document.getElementById(`${edit_id}-edit`)!.hidden = true;
 
     axios
-      .put("/admin/users", {
+      .put("/api/admin/users", {
         user_id: edit_id,
         name: (document.getElementById(`${edit_id}-name`) as HTMLInputElement).value,
         email: (document.getElementById(`${edit_id}-email`) as HTMLInputElement).value,
@@ -39,7 +39,7 @@
 
   function reset_password() {
     axios
-      .patch("/admin/users", {
+      .patch("/api/admin/users", {
         user_id: edit_id,
       })
       .then((res: any) => {
@@ -70,7 +70,7 @@
 
   function add_save() {
     axios
-      .post("/admin/users", {
+      .post("/api/admin/users", {
         name: (document.getElementById('name') as HTMLInputElement).value,
         email: (document.getElementById('email') as HTMLInputElement).value,
         admin: (document.getElementById('admin') as HTMLInputElement).checked,
@@ -85,7 +85,7 @@
 </script>
 
 <article>
-  <h1>Admin Settings</h1>
+  <h1>Users</h1>
 
   <section>
     <table id="users" class="table">

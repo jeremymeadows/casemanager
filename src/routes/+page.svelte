@@ -123,7 +123,9 @@
     let end_year = end_date.getFullYear();
 
     let dates = [];
-    let date_data = [];
+    let created_dates = [];
+    let closed_dates = [];
+    let open_cases = [];
 
     for (let year = start_year; year <= end_year; year += 1) {
       let start_month = year === start_year ? start_date.getMonth() : 0;
@@ -148,13 +150,26 @@
             dates.push(`${start}-${stop}`);
           }
 
-          date_data.push(
+          let interval_date = {
+            start: new Date(`${year}-${month + 1}-${start}`),
+            stop: new Date(`${year}-${month + 1}-${stop}`),
+          }
+
+          created_dates.push(
+            cases.filter(
+              (e) => e.created >= interval_date.start && e.created <= interval_date.stop
+            ).length
+          );
+          closed_dates.push(
+            cases.filter(
+              (e) => e.closed && e.closed >= interval_date.start && e.closed <= interval_date.stop
+            ).length
+          );
+          open_cases.push(
             cases.filter(
               (e) =>
-                e.created.getFullYear() === year &&
-                e.created.getMonth() === month &&
-                e.created.getDate() >= start &&
-                e.created.getDate() <= stop
+                e.created <= interval_date.stop &&
+                (e.closed ? e.closed > interval_date.stop : true)
             ).length
           );
         }
@@ -167,8 +182,18 @@
         labels: dates,
         datasets: [
           {
-            label: "# of Cases",
-            data: date_data,
+            label: "# of Cases Created",
+            data: created_dates,
+            borderWidth: 1,
+          },
+          {
+            label: "# of Cases Closed",
+            data: closed_dates,
+            borderWidth: 1,
+          },
+          {
+            label: "# of Cases Open",
+            data: open_cases,
             borderWidth: 1,
           },
         ],
@@ -337,7 +362,8 @@
   }
 
   .buttons input[type="radio"]:checked {
-    background-color: cyan;
+    background-color: var(--primary);
+    color: white;
   }
 
   .buttons input[type="radio"]::after {
