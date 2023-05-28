@@ -1,5 +1,6 @@
 <script lang="ts">
   import axios from "axios";
+  import { open_dialog_modal, close_dialog } from "$lib/utils/dialogs";
 
   export let data;
 
@@ -131,7 +132,7 @@
                 </button>
                 <button
                   class="button is-small is-danger"
-                  on:click={() => document.getElementById('password-confirm').showModal()}
+                  on:click={() => open_dialog_modal('password-confirm')}
                 >
                   Reset<br />Password
                 </button>
@@ -178,18 +179,19 @@
       <div class="center">
         <button
           class="button"
-          on:click={() => document.getElementById('password-confirm')?.close()}
+          on:click={close_dialog}
         >
           Cancel
         </button>
         <button
           class="button is-danger"
-          on:click={() => {
-            document.getElementById('password-confirm')?.close();
+          on:click={(ev) => {
+            close_dialog(ev);
             reset_password();
+            cancel();
           }}
         >
-        Reset
+          Reset
         </button>
       </div>
     </dialog>
@@ -197,7 +199,7 @@
     <dialog id="new-password">
       <p>The new password for <span id="password-email" /> is <code id="password" /></p>
       <br />
-      <button class="button center" on:click={() => document.getElementById('new-password')?.close()}>Close</button>
+      <button class="button center" on:click={close_dialog}>Close</button>
     </dialog>
   </section>
 </article>

@@ -34,7 +34,7 @@ export async function POST({
 export async function DELETE({ cookies }: { cookies: any }) {
   const session_id = cookies.get("session");
 
-  await db.query("DELETE FROM sessions WHERE session_id = $1", [session_id]);
+  await db.query("DELETE FROM sessions WHERE session_id = $1 OR expires < CURRENT_DATE", [session_id]);
   cookies.delete("session");
 
   return json(true);

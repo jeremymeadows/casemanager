@@ -2,9 +2,9 @@ import { error } from "@sveltejs/kit";
 import pg from "pg";
 
 export const db = new pg.Client({
-  host: "192.0.0.10",
-  user: "root",
-  password: "toor",
+  host: "localhost",
+  user: "admin",
+  password: "admin",
   database: "dkitsu",
   port: 5432,
 });

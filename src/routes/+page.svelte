@@ -11,7 +11,7 @@
   const types = data.types;
 
   function draw_charts() {
-    let options = {
+    let options: object = {
       animation: {
         duration: 0,
       },
@@ -23,22 +23,22 @@
     };
 
     return [
-      new Chart(document.getElementById("status-chart") as HTMLCanvasElement, {
-        type: "pie",
-        data: {
-          labels: ["Open", "Closed"],
-          datasets: [
-            {
-              label: "# of Cases",
-              data: [true, false].map(
-                (status) => cases.filter((e) => e.is_open === status).length
-              ),
-              borderWidth: 1,
-            },
-          ],
-        },
-        options: options,
-      }),
+      // new Chart(document.getElementById("status-chart") as HTMLCanvasElement, {
+      //   type: "pie",
+      //   data: {
+      //     labels: ["Open", "Closed"],
+      //     datasets: [
+      //       {
+      //         label: "# of Cases",
+      //         data: [true, false].map(
+      //           (status) => cases.filter((e) => e.is_open === status).length
+      //         ),
+      //         borderWidth: 1,
+      //       },
+      //     ],
+      //   },
+      //   options: options,
+      // }),
       new Chart(document.getElementById("type-chart") as HTMLCanvasElement, {
         type: "pie",
         data: {
@@ -47,8 +47,7 @@
             {
               label: "# of Cases",
               data: [...Object.keys(types), null].map(
-                // (type) => cases.filter((e) => e.type === type && document.getElementById('open-filter')!.checked ? e.is_open : true).length
-                (type) => cases.filter((e) => e.type === type && (document.getElementById('open-filter')!.checked ? e.is_open : true)).length
+                (type) => cases.filter((e) => e.type === type && ((document.getElementById('open-filter') as HTMLInputElement).checked ? e.is_open : true)).length
               ),
               borderWidth: 1,
             },
@@ -231,7 +230,6 @@
         }"]`
       )! as HTMLInputElement
     ).checked = true;
-    // (document.querySelector('input[name="date-interval"]')! as HTMLInputElement).value = initial_time ? initial_time[2] : '4';
 
     let charts = draw_charts();
     let timeline = draw_timeline();
@@ -263,10 +261,10 @@
 <article>
   <section>
     <div class="columns">
-      <div class="column box">
-        <label for="status-chart">Cases By Status</label>
-        <canvas id="status-chart" />
-      </div>
+      <!-- <div class="column box"> -->
+      <!--   <label for="status-chart">Cases By Status</label> -->
+      <!--   <canvas id="status-chart" /> -->
+      <!-- </div> -->
       <div class="column box">
         <label for="type-chart">Cases By Type <aside><Switch id="open-filter" left="all" right="open"/></aside></label>
         <canvas id="type-chart" />
@@ -342,7 +340,6 @@
   .box {
     background-color: var(--bg);
     margin: 0;
-    /* padding: auto -0.4rem; */
   }
 
   label {

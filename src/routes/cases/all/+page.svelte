@@ -6,21 +6,25 @@
   export let data;
 
   let cases = data.cases;
-  let sort_method = 'created';
+  let sort_method: string = 'created';
   let sort_reversed = false;
 
   let count = 0;
   let show_closed = false;
   let search = '';
 
-  let fields = {
-    is_open: 'Status',
-  };
-  let display_fields = [
-    'is_open'
-  ];
+  // let fields = {
+  //   is_open: 'Status',
+  // };
+  // let display_fields = [
+  //   'is_open'
+  // ];
 
   onMount(() => {
+    let [method, rev] = localStorage.getItem('sorting')?.split(';') ?? [sort_method, sort_reversed];
+    [sort_method, sort_reversed] = ['', rev === 'true'];
+    sort(method.toString());
+
     document.querySelectorAll("[data-href]").forEach((e) => {
       e.addEventListener("click", () => {
         window.location.pathname = e.getAttribute("data-href")!;
@@ -49,6 +53,8 @@
       default:
         cases = cases.sort((a, b) => (sort_reversed ? -1 : 1) * (a[field] ? a[field].localeCompare(b[field]) : sort_reversed));
     }
+
+    localStorage.setItem('sorting', `${sort_method};${sort_reversed}`);
   }
 
   // function select(e: MouseEvent) {
@@ -100,7 +106,10 @@
   <!--   </div> -->
   <!-- </div> -->
 
-  <input id="show-closed" type="checkbox" bind:checked={show_closed} /> Show Closed Cases
+  <div class="field">
+    <label for="show-closed">Show Closed Cases</label>
+    <input id="show-closed" type="checkbox" bind:checked={show_closed} />
+  </div>
   <input id="search" class="input" placeholder="Search" bind:value={search} />
 
   <!-- <button on:click={sort}>sort</button> -->
@@ -119,8 +128,6 @@
       </thead>
       <tbody>
         {#each cases as c}
-          <!-- <tr data-href={`/cases/${c.case_id}`} class:closed={!c.is_open} hidden={(c.is_open ? false : !show_closed) || (!!search && !search.includes(c.name))}> -->
-          <!-- <tr data-href={`/cases/${c.case_id}`} class:closed={!c.is_open} hidden={(c.is_open ? false : !show_closed) || (search !== '' && !(c.name.toLowerCase().includes(search.toLowerCase())))}> -->
           <tr
             data-href={`/cases/${c.case_id}`}
             class:closed={!c.is_open}
@@ -143,6 +150,14 @@
   .dropdown-item, .dropdown-content {
     padding: 0;
     /* background-color: #0000; */
+  }
+
+  th:not(:nth-child(1)), tr {
+    cursor: pointer;
+  }
+
+  th:hover:not(:nth-child(1)) {
+    background-color: var(--bg-shaded);
   }
 
   .sorted::after {

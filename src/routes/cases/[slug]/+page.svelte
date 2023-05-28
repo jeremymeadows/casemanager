@@ -87,7 +87,9 @@
 </script>
 
 <article>
-  <a id="back" class="button is-small" href="/cases/all"><i class='bx bx-chevron-left' ></i> Back</a>
+  {#if data.case}
+    <a id="back" class="button is-small" href="/cases/all"><i class='bx bx-chevron-left' ></i> Back</a>
+  {/if}
 
   <h1>{data.case ? `Case #${data.case.case_id}` : 'New Case'}</h1>
 

@@ -8,7 +8,6 @@
   }
 
   function check_password(): boolean {
-    let old_password = (document.getElementById('old')! as HTMLInputElement).value;
     let password = (document.getElementById('new')! as HTMLInputElement).value;
     let password_conf = (document.getElementById('new-conf')! as HTMLInputElement).value;
 
@@ -36,8 +35,8 @@
         message.parentElement!.classList.add('is-success');
         message.textContent = 'Password updated successfully.';
 
-        form.querySelectorAll("input:not([type=submit])").forEach((e: HTMLInputElement) => {
-          e.value = "";
+        form.querySelectorAll("input:not([type=submit])").forEach((el: Element) => {
+          (el as HTMLInputElement).value = "";
         });
       })
       .catch((err: any) => {
@@ -58,6 +57,11 @@
           e.disabled = false;
         });
       });
+  }
+
+  function start_change_password(ev: MouseEvent) {
+    (ev.target as HTMLDivElement).parentElement.hidden = true;
+    document.getElementById('change-password').hidden = false;
   }
 </script>
 
@@ -82,10 +86,7 @@
   <div>
     <button
       class="button center"
-      on:click={(event) => {
-        event.target.parentElement.hidden = true;
-        document.getElementById('change-password').hidden = false;
-      }}
+      on:click={start_change_password}
     >
       Change Password
     </button>
