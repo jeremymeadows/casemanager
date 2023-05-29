@@ -1,10 +1,13 @@
 import { error } from "@sveltejs/kit";
+import dotenv from "dotenv";
 import pg from "pg";
 
+dotenv.config();
+
 export const db = new pg.Client({
-  host: "localhost",
-  user: "admin",
-  password: "admin",
+  host: "db",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   database: "dkitsu",
   port: 5432,
 });
