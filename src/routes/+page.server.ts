@@ -20,7 +20,7 @@ export async function load({ cookies }: { cookies: any }) {
         CASE
           WHEN (SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1)
             THEN TRUE
-            ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1)
+            ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1) OR assignee IS NULL
         END
       `,
     [session_id]

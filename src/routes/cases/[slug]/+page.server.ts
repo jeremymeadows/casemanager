@@ -1,32 +1,37 @@
 import { error } from "@sveltejs/kit";
 import { db } from "$lib/server/database";
+import { get_session } from "$lib/utils/auth";
 
-export async function load({ params }: { params: { slug: number | "new" } }) {
+export async function load({
+  params,
+  cookies,
+}: {
+  params: { slug: number | "new" };
+  cookies: any;
+}) {
   if (params.slug === "new") {
     return {
       case: null,
     };
   }
 
+  let session_id = get_session(cookies);
+
   let res = await db.query(
     `
       SELECT
-        case_id,
-        cases.name AS name,
-        student_number,
-        description,
-        type,
-        subtype,
-        assignee,
-        users.name AS assignee_name,
-        is_open,
-        created,
-        closed
+        cases.*,
+        users.name AS assignee_name
       FROM cases
       LEFT JOIN users ON cases.assignee = users.user_id
-      WHERE case_id = $1
+      WHERE case_id = $1 AND
+        CASE
+          WHEN (SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $2)
+            THEN TRUE
+          ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $2) OR assignee IS NULL
+        END
     `,
-    [params.slug]
+    [params.slug, session_id]
   );
 
   if (res.rowCount === 0) {

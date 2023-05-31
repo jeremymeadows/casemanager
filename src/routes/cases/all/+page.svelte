@@ -9,7 +9,7 @@
   let sort_method: string = 'created';
   let sort_reversed = false;
 
-  let count = 0;
+  // let count = 0;
   let show_closed = false;
   let search = '';
 
@@ -31,12 +31,12 @@
       });
     });
 
-    count = count_cases();
+    // count = count_cases();
   });
 
-  function count_cases(): number {
-    return document.querySelectorAll(`tr:not(.filtered)${show_closed ? '' : ':not(.closed)'}`).length;
-  }
+  // function count_cases(): number {
+  //   return document.querySelectorAll(`tr:not(.filtered)${show_closed ? '' : ':not(.closed)'}`).length;
+  // }
 
   function sort(field: string) {
     if (sort_method === field) {
@@ -112,8 +112,6 @@
   </div>
   <input id="search" class="input" placeholder="Search" bind:value={search} />
 
-  <!-- <button on:click={sort}>sort</button> -->
-
   <br />
   <br />
 
@@ -131,7 +129,12 @@
           <tr
             data-href={`/cases/${c.case_id}`}
             class:closed={!c.is_open}
-            class:filtered={search !== '' && !(c.name.toLowerCase().includes(search.toLowerCase()))}
+            class:filtered={
+              search !== '' && !(
+                c.name.toLowerCase().includes(search.toLowerCase()) ||
+                c.description.toLowerCase().includes(search.toLowerCase())
+              )
+            }
             hidden={(c.is_open ? false : !show_closed)}
           >
             <td>{c.is_open ? "Open" : "Closed"}</td>

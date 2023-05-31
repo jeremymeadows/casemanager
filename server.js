@@ -11,21 +11,29 @@ dotenv.config();
 
 const app = express();
 
-const credentials = {
-  cert: fs.readFileSync(process.env.TLS_CERT),
-  key: fs.readFileSync(process.env.TLS_CERT_KEY),
-};
+const http_port = process.env.HTTP_PORT ?? 80;
+const https_port = process.env.HTTPS_PORT ?? 443;
 
-http
-  .createServer(app)
-  .listen(80, () => console.log("HTTP server running on: http://localhost"));
-https
-  .createServer(credentials, app)
-  .listen(443, () => console.log("HTTPS server running on: https://localhost"));
+if (http_port) {
+  http
+    .createServer(app)
+    .listen(http_port, () => console.log(`HTTP server running on: http://localhost:${http_port}`));
+}
+
+if (https_port) {
+  const credentials = {
+    cert: fs.readFileSync(process.env.TLS_CERT),
+    key: fs.readFileSync(process.env.TLS_CERT_KEY),
+  };
+
+  https
+    .createServer(credentials, app)
+    .listen(https_port, () => console.log(`HTTPS server running on: https://localhost:${https_port}`));
+}
 
 app.use((req, res) => {
   // redirect http requests to the https version
-  if (req.protocol === "http") {
+  if (https_port && req.protocol === "http") {
     return res.redirect(307, `https://${req.headers.host}${req.url}`);
   }
 

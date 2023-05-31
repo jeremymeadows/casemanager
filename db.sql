@@ -42,9 +42,10 @@ CREATE TABLE cases (
   subtype VARCHAR(32),
   assignee INTEGER,
   is_open BOOLEAN NOT NULL DEFAULT TRUE,
+  description TEXT,
+  contact_method VARCHAR(32),
   created DATE NOT NULL DEFAULT CURRENT_DATE,
   closed DATE,
-  description TEXT,
   PRIMARY KEY (case_id),
   FOREIGN KEY (assignee) REFERENCES users (user_id),
   FOREIGN KEY (type, subtype) REFERENCES subtypes (parent, name)

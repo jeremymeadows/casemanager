@@ -26,7 +26,6 @@
 
     for (let subtype of data.types[type_select.value]) {
       opt = document.createElement("option");
-      opt.value = subtype;
       opt.textContent = subtype;
 
       subtype_select.appendChild(opt);
@@ -37,15 +36,19 @@
     let type = (document.getElementById("type") as HTMLSelectElement).value;
     let subtype = (document.getElementById("subtype") as HTMLSelectElement).value;
     let assignee = (document.getElementById("assignee") as HTMLSelectElement).value;
+    let contact_method = (document.getElementById("contact-method") as HTMLSelectElement).value;
 
     return {
       name: (document.getElementById("name") as HTMLInputElement).value,
       student_number: (document.getElementById("student-number") as HTMLInputElement).value,
       type: type ? type : null,
       subtype: subtype ? subtype : null,
+      contact_method: contact_method ? contact_method : null,
       description: (document.getElementById("description") as HTMLTextAreaElement).value,
       assignee: assignee ? assignee : null,
       is_open: (document.getElementById("status") as HTMLInputElement).checked,
+      just_closed: data.case?.is_open && !(document.getElementById("status") as HTMLInputElement).checked,
+      closed: data.case?.closed,
     };
   }
 
@@ -88,7 +91,7 @@
 
 <article>
   {#if data.case}
-    <a id="back" class="button is-small" href="/cases/all"><i class='bx bx-chevron-left' ></i> Back</a>
+    <a id="back" class="button is-small" href="/cases/all"><i class='bx bx-chevron-left' /> Back</a>
   {/if}
 
   <h1>{data.case ? `Case #${data.case.case_id}` : 'New Case'}</h1>
@@ -171,7 +174,7 @@
             <select id="type" on:change={swap_subtypes}>
               <option value="" selected disabled>&mdash;</option>
               {#each Object.keys(data.types) as type}
-                <option value={type} selected={type == data.case?.type}>{type}</option>
+                <option selected={type == data.case?.type}>{type}</option>
               {/each}
             </select>
           </div>
@@ -185,7 +188,7 @@
           <div class="select">
             <select id="subtype">
               {#each data.case && data.case.type ? data.types[data.case.type] : [] as subtype}
-                <option value={subtype} selected={subtype == data.case?.subtype}>{subtype}</option>
+                <option selected={subtype == data.case?.subtype}>{subtype}</option>
               {/each}
             </select>
           </div>
@@ -201,14 +204,14 @@
         {#if edit}
           <div class="select">
             <select id="contact-method">
-              <option value="" selected>&mdash;<option>
-              <option value="email">Email</option>
-              <option value="phone">Phone</option>
-              <option value="person">In-Person</option>
+              <option value="" selected={!data.case || !data.case.contact_method}>&mdash;</option>
+              <option selected={data.case?.contact_method === "Email"}>Email</option>
+              <option selected={data.case?.contact_method === "Phone"}>Phone</option>
+              <option selected={data.case?.contact_method === "In-Person"}>In-Person</option>
             </select>
           </div>
         {:else}
-          <div>todo</div>
+          <div>{data.case.contact_method ?? "N/A"}</div>
         {/if}
       </div>
 

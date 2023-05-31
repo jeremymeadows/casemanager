@@ -12,6 +12,7 @@ export async function load({ cookies }: { cookies: any }) {
         is_open,
         type,
         created,
+        description,
         users.name as assignee
       FROM cases
       LEFT JOIN users ON cases.assignee = users.user_id
@@ -19,7 +20,7 @@ export async function load({ cookies }: { cookies: any }) {
         CASE
           WHEN (SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1)
             THEN TRUE
-          ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1)
+          ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1) OR assignee IS NULL
         END
       ORDER BY is_open DESC, created
       `,

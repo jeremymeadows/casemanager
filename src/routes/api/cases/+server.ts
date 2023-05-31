@@ -6,8 +6,8 @@ export async function POST({ request }: { request: any }) {
 
   let res = await db.query(
     `
-      INSERT INTO cases (name, student_number, type, subtype, assignee, is_open, description, closed) VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO cases (name, student_number, type, subtype, assignee, is_open, description, contact_method, closed) VALUES
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING case_id
     `,
     [
@@ -18,6 +18,7 @@ export async function POST({ request }: { request: any }) {
       data.assignee,
       data.is_open,
       data.description,
+      data.contact_method,
       data.is_open ? null : new Date(),
     ]
   );
@@ -27,6 +28,7 @@ export async function POST({ request }: { request: any }) {
 
 export async function PUT({ request }: { request: any }) {
   const data = await request.json();
+  console.log(data)
 
   await db.query(
     `
@@ -37,9 +39,10 @@ export async function PUT({ request }: { request: any }) {
         subtype = $4,
         assignee = $5,
         is_open = $6,
-        description = $7
-        closed = $8
-      WHERE case_id = $9
+        description = $7,
+        contact_method = $8,
+        closed = $9
+      WHERE case_id = $10
     `,
     [
       data.name,
@@ -49,7 +52,8 @@ export async function PUT({ request }: { request: any }) {
       data.assignee,
       data.is_open,
       data.description,
-      data.closed,
+      data.contact_method,
+      data.is_open ? null : (data.just_closed ? new Date() : data.closed),
       data.case_id,
     ]
   );
