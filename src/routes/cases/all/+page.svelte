@@ -1,42 +1,29 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import SelectList from "$lib/components/SelectList.svelte";
+  import SelectListItem from "$lib/components/SelectListItem.svelte";
   import { dtfmt } from "$lib/utils/dates";
-  import {  } from "$app/stores";
 
   export let data;
 
   let cases = data.cases;
+
+  let search = '';
   let sort_method: string = 'created';
   let sort_reversed = false;
 
-  // let count = 0;
-  let show_closed = false;
-  let search = '';
+  let status_filter = 'Open';
+  let type_filter: string[] = [];
 
-  // let fields = {
-  //   is_open: 'Status',
-  // };
-  // let display_fields = [
-  //   'is_open'
-  // ];
-
-  onMount(() => {
-    let [method, rev] = localStorage.getItem('sorting')?.split(';') ?? [sort_method, sort_reversed];
-    [sort_method, sort_reversed] = ['', rev === 'true'];
-    sort(method.toString());
-
-    document.querySelectorAll("[data-href]").forEach((e) => {
-      e.addEventListener("click", () => {
-        window.location.pathname = e.getAttribute("data-href")!;
-      });
-    });
-
-    // count = count_cases();
-  });
-
-  // function count_cases(): number {
-  //   return document.querySelectorAll(`tr:not(.filtered)${show_closed ? '' : ':not(.closed)'}`).length;
-  // }
+  let columns = [
+    { field: 'status', name: 'Status' },
+    { field: 'created', name: 'Open Date' },
+    { field: 'name', name: 'Name' },
+    { field: 'type', name: 'Type' },
+    { field: 'subtype', name: 'Subtype' },
+    { field: 'assignee', name: 'Owner' },
+  ];
+  let view_columns = ['status', 'created', 'name', 'type'].concat(data.user.is_admin ? ['assignee'] : []);
 
   function sort(field: string) {
     if (sort_method === field) {
@@ -57,72 +44,57 @@
     localStorage.setItem('sorting', `${sort_method};${sort_reversed}`);
   }
 
-  // function select(e: MouseEvent) {
-  //   console.log(e)
-  //   let option = e.target as HTMLOptionElement;
-  //   if (option.selected) {
-  //     // option.selected = false;
-  //   }
-  // }
+  onMount(() => {
+    let [method, rev] = localStorage.getItem('sorting')?.split(';') ?? [sort_method, sort_reversed];
+    [sort_method, sort_reversed] = ['', rev === 'true'];
+    sort(method.toString());
 
-  // $: if (document) {
-  // //   // document.styleSheets[-1]
-  //   count = count_cases();
-  // //   // count = document.querySelectorAll('tr[hidden="false"]').length;
-  // }
+    document.querySelectorAll("[data-href]").forEach((e) => {
+      e.addEventListener("click", () => {
+        window.location.pathname = e.getAttribute("data-href")!;
+      });
+    });
+  });
 </script>
 
 <article>
-  <!-- <h1>Cases ({count})</h1> -->
   <h1>Cases</h1>
 
-  <!-- <div class="dropdown is-hoverable"> -->
-  <!--   <div class="dropdown-trigger"> -->
-  <!--     <button -->
-  <!--       class="button" -->
-  <!--       aria-haspopup="true" -->
-  <!--       aria-controls="dropdown-menu4" -->
-  <!--     > -->
-  <!--       <span>Hover me</span> -->
-  <!--       <span class="icon is-small"> -->
-  <!--         <i class="bx bx-chevron-down" /> -->
-  <!--       </span> -->
-  <!--     </button> -->
-  <!--   </div> -->
-  <!--   <div class="dropdown-menu" role="menu"> -->
-  <!--     <div class="dropdown-content"> -->
-  <!--       <div class="dropdown-item"> -->
-  <!--         <div class="select is-multiple"> -->
-  <!--           <select id="fields" multiple on:click|preventDefault={select}> -->
-  <!--             <option>Status</option> -->
-  <!--             <option>Open Date</option> -->
-  <!--             <option>Name</option> -->
-  <!--             <option>Type</option> -->
-  <!--             <option>Owner</option> -->
-  <!--           </select> -->
-  <!--         </div> -->
-  <!--       </div> -->
-  <!--     </div> -->
-  <!--   </div> -->
-  <!-- </div> -->
+  <div class="field is-grouped">
+    <SelectList id="status-filter" label="Status" bind:selection={status_filter} multiple={false}>
+      <SelectListItem selected>Open</SelectListItem>
+      <SelectListItem>Closed</SelectListItem>
+      <SelectListItem>All</SelectListItem>
+    </SelectList>
 
-  <div class="field">
-    <label for="show-closed">Show Closed Cases</label>
-    <input id="show-closed" type="checkbox" bind:checked={show_closed} />
+    <input id="search" class="input" placeholder="Search for a Name or Description" bind:value={search} />
+
+    <SelectList id="type-filter" label="Types" bind:selection={type_filter}>
+      {#each Object.keys(data.types) as type}
+        <SelectListItem>{type}</SelectListItem>
+      {/each}
+      <SelectListItem value="">None</SelectListItem>
+    </SelectList>
+
+    <SelectList id="view-columns" label="Columns" bind:selection={view_columns}>
+      {#each columns as { field, name }}
+        <SelectListItem value={field} selected={view_columns.includes(field)}>{name}</SelectListItem>
+      {/each}
+    </SelectList>
   </div>
-  <input id="search" class="input" placeholder="Search" bind:value={search} />
 
-  <br />
   <br />
 
   <section>
     <table id="summary" class="table is-hoverable is-fullwidth">
       <thead>
-        <th>Status</th>
-        <th class:sorted={sort_method === 'created'} class:reversed={sort_reversed} on:click={() => sort('created')}>Open Date</th>
-        <th class:sorted={sort_method === 'name'} class:reversed={sort_reversed} on:click={() => sort('name')}>Name</th>
-        <th class:sorted={sort_method === 'type'} class:reversed={sort_reversed} on:click={() => sort('type')}>Type</th>
-        <th class:sorted={sort_method === 'assignee'} class:reversed={sort_reversed} on:click={() => sort('assignee')}>Owner</th>
+        {#each columns as { field, name }}
+          {#if field === 'status'}
+            <th hidden={!view_columns.includes(field)}>Status</th>
+          {:else}
+            <th hidden={!view_columns.includes(field)} class:sorted={sort_method === field} class:reversed={sort_reversed} on:click={() => sort(field)}>{name}</th>
+          {/if}
+        {/each}
       </thead>
       <tbody>
         {#each cases as c}
@@ -130,18 +102,26 @@
             data-href={`/cases/${c.case_id}`}
             class:closed={!c.is_open}
             class:filtered={
-              search !== '' && !(
-                c.name.toLowerCase().includes(search.toLowerCase()) ||
-                c.description.toLowerCase().includes(search.toLowerCase())
+              !(
+                (
+                  c.name.toLowerCase().includes(search.toLowerCase()) ||
+                  c.description.toLowerCase().includes(search.toLowerCase())
+                ) &&
+                (
+                  type_filter.length === 0 ||
+                  type_filter.includes(c.type ?? '')
+                )
               )
             }
-            hidden={(c.is_open ? false : !show_closed)}
+            title={c.description}
+            hidden={c.is_open && status_filter === 'Closed' || !c.is_open && status_filter === 'Open'}
           >
-            <td>{c.is_open ? "Open" : "Closed"}</td>
-            <td>{dtfmt("dd mmmm yyyy", c.created)}</td>
-            <td>{c.name}</td>
-            <td>{c.type ?? 'None'}</td>
-            <td>{c.assignee ?? 'Unassigned'}</td>
+            <td hidden={!view_columns.includes('status')}>{c.is_open ? "Open" : "Closed"}</td>
+            <td hidden={!view_columns.includes('created')}>{dtfmt("dd mmmm yyyy", c.created)}</td>
+            <td hidden={!view_columns.includes('name')}>{c.name}</td>
+            <td hidden={!view_columns.includes('type')}>{c.type ?? 'None'}</td>
+            <td hidden={!view_columns.includes('subtype')}>{c.subtype ?? 'None'}</td>
+            <td hidden={!view_columns.includes('assignee')}>{c.assignee ?? 'Unassigned'}</td>
           </tr>
         {/each}
       </tbody>
@@ -150,9 +130,8 @@
 </article>
 
 <style lang="scss">
-  .dropdown-item, .dropdown-content {
-    padding: 0;
-    /* background-color: #0000; */
+  .field.is-grouped {
+    gap: 0.5rem;
   }
 
   th:not(:nth-child(1)), tr {
@@ -169,13 +148,11 @@
     border-right: 0;
     border-top: 0;
     content: "";
-    /* display: block; */
     height: 0.625em;
     margin-top: 0.5em;
     margin-left: 0.5em;
     pointer-events: none;
     position: absolute;
-    /* top: 50%; */
     transform: rotate(-45deg);
     transform-origin: center;
     width: 0.625em;
@@ -183,10 +160,6 @@
 
   .sorted.reversed::after {
     transform: rotate(135deg);
-  }
-
-  .select {
-    width: 100%;
   }
 
   .closed {

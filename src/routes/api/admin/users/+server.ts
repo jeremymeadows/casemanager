@@ -1,5 +1,6 @@
 import { json, error } from "@sveltejs/kit";
 import { db, get_user, is_admin } from "$lib/server/database";
+import { random_string } from "$lib/utils/misc";
 import bcrypt from "bcrypt";
 
 // new account
@@ -81,14 +82,7 @@ export async function PATCH({
     }
   }
 
-  password ??= Array(8)
-    .fill(null)
-    .map((_) =>
-      ((Math.random() * 36) | 0)
-        .toString(36)
-        [Math.random() < 0.5 ? "toString" : "toUpperCase"]()
-    )
-    .join("");
+  password ??= random_string(8);
 
   let res = await db.query("UPDATE users SET password = $1 WHERE user_id = $2 RETURNING email", [
     await bcrypt.hash(password, await bcrypt.genSalt(10)),
@@ -98,6 +92,8 @@ export async function PATCH({
   if (res.rowCount === 0) {
     throw error(404);
   }
+
+  await db.query("DELETE FROM sessions WHERE user_id = $1", [user_id]);
 
   return json({
     password: password,

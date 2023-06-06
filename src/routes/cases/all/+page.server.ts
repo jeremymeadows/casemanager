@@ -11,6 +11,7 @@ export async function load({ cookies }: { cookies: any }) {
         cases.name,
         is_open,
         type,
+        subtype,
         created,
         description,
         users.name as assignee
