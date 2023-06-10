@@ -16,10 +16,7 @@ export async function POST({
 
   let { type } = await request.json();
 
-  await db.query(
-    "INSERT INTO types (name) VALUES ($1)",
-    [type]
-  );
+  await db.query("INSERT INTO types (name) VALUES ($1)", [type]);
 
   return json(true);
 }
@@ -39,10 +36,10 @@ export async function PUT({
 
   let { type, subtype } = await request.json();
 
-  await db.query(
-    "INSERT INTO subtypes (parent, name) VALUES ($1, $2)",
-    [type, subtype]
-  );
+  await db.query("INSERT INTO subtypes (parent, name) VALUES ($1, $2)", [
+    type,
+    subtype,
+  ]);
 
   return json(true);
 }
@@ -62,10 +59,12 @@ export async function PATCH({
 
   let { type, subtype } = await request.json();
 
-  await db.query(
-    "DELETE FROM subtypes WHERE parent = $1 AND name = $2",
-    [type, subtype]
-  );
+  await db.query("UPDATE cases SET subtype = NULL WHERE subtype = $1", [subtype]);
+
+  await db.query("DELETE FROM subtypes WHERE parent = $1 AND name = $2", [
+    type,
+    subtype,
+  ]);
 
   return json(true);
 }
@@ -84,13 +83,10 @@ export async function DELETE({
   }
 
   let { type } = await request.json();
-  console.log(type)
 
-  await db.query(
-    "DELETE FROM types WHERE name = $1",
-    [type]
-  );
+  await db.query("UPDATE cases SET type = NULL WHERE type = $1", [type]);
+
+  await db.query("DELETE FROM types WHERE name = $1", [type]);
 
   return json(true);
 }
-

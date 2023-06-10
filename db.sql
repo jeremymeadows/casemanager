@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS cases;
+DROP TABLE IF EXISTS contact;
 DROP TABLE IF EXISTS subtypes;
 DROP TABLE IF EXISTS types;
 DROP TABLE IF EXISTS sessions;
@@ -23,7 +24,6 @@ CREATE TABLE sessions (
 
 CREATE TABLE types (
   name VARCHAR(32) NOT NULL,
-  -- subtype VARCHAR(32) NOT NULL,
   PRIMARY KEY (name)
 );
 
@@ -32,6 +32,11 @@ CREATE TABLE subtypes (
   name VARCHAR(32) NOT NULL,
   PRIMARY KEY (parent, name),
   FOREIGN KEY (parent) REFERENCES types (name)
+);
+
+CREATE TABLE contact (
+  method VARCHAR(32) NOT NULL,
+  PRIMARY KEY (method)
 );
 
 CREATE TABLE cases (
@@ -48,7 +53,8 @@ CREATE TABLE cases (
   closed DATE,
   PRIMARY KEY (case_id),
   FOREIGN KEY (assignee) REFERENCES users (user_id),
-  FOREIGN KEY (type, subtype) REFERENCES subtypes (parent, name)
+  FOREIGN KEY (type, subtype) REFERENCES subtypes (parent, name),
+  FOREIGN KEY (contact_method) REFERENCES contact (method)
 );
 
 
@@ -81,6 +87,13 @@ INSERT INTO subtypes (parent, name) VALUES
   ('Welfare', 'Sexual Health'),
   ('General', 'Student Leap Card'),
   ('General', 'Other');
+
+INSERT INTO contact (method) VALUES
+  ('Email'),
+  ('Phone'),
+  ('In-Person'),
+  ('Social Media'),
+  ('Other');
 
 
 -- create and adjust mock data

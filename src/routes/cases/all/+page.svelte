@@ -3,10 +3,12 @@
   import SelectList from "$lib/components/SelectList.svelte";
   import SelectListItem from "$lib/components/SelectListItem.svelte";
   import { dtfmt } from "$lib/utils/dates";
+  import { sleep } from "$lib/utils/misc";
 
   export let data;
 
   let cases = data.cases;
+  let mounted = false;
 
   let search = '';
   let sort_method: string = 'created';
@@ -16,12 +18,16 @@
   let type_filter: string[] = [];
 
   let columns = [
+    { field: 'case_id', name: '#' },
     { field: 'status', name: 'Status' },
     { field: 'created', name: 'Open Date' },
+    { field: 'closed', name: 'Close Date' },
     { field: 'name', name: 'Name' },
+    { field: 'student_number', name: 'Student Number' },
     { field: 'type', name: 'Type' },
     { field: 'subtype', name: 'Subtype' },
     { field: 'assignee', name: 'Owner' },
+    { field: 'contact_method', name: 'Contact Method' },
   ];
   let view_columns = ['status', 'created', 'name', 'type'].concat(data.user.is_admin ? ['assignee'] : []);
 
@@ -29,11 +35,14 @@
     if (sort_method === field) {
       sort_reversed = !sort_reversed;
     } else {
+      if (sort_method !== '') {
+        sort_reversed = false;
+      }
       sort_method = field;
-      sort_reversed = false;
     }
 
     switch (field) {
+      case 'case_id':
       case 'created':
         cases = cases.sort((a, b) => (sort_reversed ? -1 : 1) * ((a[field] ? a[field] - b[field] : sort_reversed) as number));
         break;
@@ -44,16 +53,29 @@
     localStorage.setItem('sorting', `${sort_method};${sort_reversed}`);
   }
 
-  onMount(() => {
+  $: if (mounted) {
+    localStorage.setItem('view_columns', view_columns.join(';'));
+  };
+
+  onMount(async () => {
+    mounted = true;
+
     let [method, rev] = localStorage.getItem('sorting')?.split(';') ?? [sort_method, sort_reversed];
     [sort_method, sort_reversed] = ['', rev === 'true'];
     sort(method.toString());
+
+    view_columns = localStorage.getItem('view_columns')?.split(';') ?? view_columns;
+    document.querySelector('thead.loading').classList.remove('loading');
 
     document.querySelectorAll("[data-href]").forEach((e) => {
       e.addEventListener("click", () => {
         window.location.pathname = e.getAttribute("data-href")!;
       });
     });
+    await sleep(1000);
+    document.querySelector('tbody.loading').classList.remove('loading');
+
+    document.querySelector('.loading-icon').remove();
   });
 </script>
 
@@ -87,16 +109,23 @@
 
   <section>
     <table id="summary" class="table is-hoverable is-fullwidth">
-      <thead>
+      <thead class="loading">
         {#each columns as { field, name }}
           {#if field === 'status'}
             <th hidden={!view_columns.includes(field)}>Status</th>
           {:else}
-            <th hidden={!view_columns.includes(field)} class:sorted={sort_method === field} class:reversed={sort_reversed} on:click={() => sort(field)}>{name}</th>
+            <th
+              hidden={!view_columns.includes(field)}
+              class:sorted={sort_method === field}
+              class:reversed={sort_reversed}
+              on:click={() => sort(field)}
+            >
+              {name}
+            </th>
           {/if}
         {/each}
       </thead>
-      <tbody>
+      <tbody class="loading">
         {#each cases as c}
           <tr
             data-href={`/cases/${c.case_id}`}
@@ -116,16 +145,22 @@
             title={c.description}
             hidden={c.is_open && status_filter === 'Closed' || !c.is_open && status_filter === 'Open'}
           >
+            <td hidden={!view_columns.includes('case_id')}>{c.case_id}</td>
             <td hidden={!view_columns.includes('status')}>{c.is_open ? "Open" : "Closed"}</td>
             <td hidden={!view_columns.includes('created')}>{dtfmt("dd mmmm yyyy", c.created)}</td>
+            <td hidden={!view_columns.includes('closed')}>{c.closed ? dtfmt("dd mmmm yyyy", c.closed) : ''}</td>
             <td hidden={!view_columns.includes('name')}>{c.name}</td>
+            <td hidden={!view_columns.includes('student_number')}><span class="d-number">D00</span>{c.student_number}</td>
             <td hidden={!view_columns.includes('type')}>{c.type ?? 'None'}</td>
             <td hidden={!view_columns.includes('subtype')}>{c.subtype ?? 'None'}</td>
             <td hidden={!view_columns.includes('assignee')}>{c.assignee ?? 'Unassigned'}</td>
+            <td hidden={!view_columns.includes('contact_method')}>{c.contact_method ?? 'N/A'}</td>
           </tr>
         {/each}
       </tbody>
     </table>
+
+    <div class="loading-icon" />
   </section>
 </article>
 
@@ -134,11 +169,11 @@
     gap: 0.5rem;
   }
 
-  th:not(:nth-child(1)), tr {
+  th:not(:nth-child(2)), tr {
     cursor: pointer;
   }
 
-  th:hover:not(:nth-child(1)) {
+  th:hover:not(:nth-child(2)) {
     background-color: var(--bg-shaded);
   }
 
@@ -169,5 +204,23 @@
 
   .filtered {
     display: none;
+  }
+
+  .d-number {
+    color: var(--grey);
+  }
+
+  .loading {
+    display: none;
+  }
+
+  .loading-icon {
+    border: 6px solid #f1f1f1;
+    border-top: 6px solid #4a4a4a;
+    border-radius: 50%;
+    width: 4rem;
+    height: 4rem;
+    animation: spin 2s ease-in-out alternate infinite;
+    margin: 64px auto;
   }
 </style>

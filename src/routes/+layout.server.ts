@@ -11,7 +11,7 @@ export async function load({
   const session_id = cookies.get("session");
   const url = new URL(request.url).pathname;
 
-  let res = await db.query(
+  let user = await db.query(
     "SELECT user_id, email, name, is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
     [
       /^([a-zA-Z0-9]){8}-(([a-zA-Z0-9]){4}-){3}([a-zA-Z0-9]){12}$/.test(
@@ -22,7 +22,7 @@ export async function load({
     ]
   );
 
-  if (res.rowCount === 0) {
+  if (user.rowCount === 0) {
     cookies.delete("session");
 
     if (url !== "/auth/login") {
@@ -46,8 +46,12 @@ export async function load({
     ORDER BY types.name
   `);
 
+  let contact_methods = await db.query(
+    "SELECT method FROM contact ORDER BY method"
+  );
+
   return {
-    user: res.rows[0],
+    user: user.rows[0],
     users: users.rows,
     types: types.rows.reduce(
       (acc, val) => (
@@ -55,5 +59,6 @@ export async function load({
       ),
       {}
     ),
+    contact_methods: contact_methods.rows.map((e) => e.method),
   };
 }

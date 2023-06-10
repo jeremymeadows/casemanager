@@ -261,10 +261,6 @@
 <article>
   <section>
     <div class="columns">
-      <!-- <div class="column box"> -->
-      <!--   <label for="status-chart">Cases By Status</label> -->
-      <!--   <canvas id="status-chart" /> -->
-      <!-- </div> -->
       <div class="column box">
         <label for="type-chart">Cases By Type<aside><Switch id="open-filter" left="all" right="open"/></aside></label>
         <canvas id="type-chart" />

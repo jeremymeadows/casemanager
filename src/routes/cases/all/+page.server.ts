@@ -9,12 +9,15 @@ export async function load({ cookies }: { cookies: any }) {
       SELECT
         case_id,
         cases.name,
+        student_number,
         is_open,
         type,
         subtype,
+        contact_method,
         created,
+        closed,
         description,
-        users.name as assignee
+        users.name AS assignee
       FROM cases
       LEFT JOIN users ON cases.assignee = users.user_id
       WHERE

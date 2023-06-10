@@ -35,10 +35,6 @@
 >
   <div class="navbar-brand">
     <a href="/" class="navbar-item">DkIT SU Case Manager</a>
-    {#if !true}
-      <!-- prevents Svelte from optimizing out `.is-current-page` from the css since it's only set via script -->
-      <div class="is-current-page" hidden />
-    {/if}
 
     <a
       id="burger-menu"
@@ -72,11 +68,6 @@
             </a>
           </div>
         </div>
-        <!-- {#each Object.entries(pages) as [page, url]} -->
-        <!--   <a href={url} class="navbar-item">{page}</a> -->
-        <!-- {/each} -->
-      <!-- {:else} -->
-      <!--   <a href="/auth/login" class="navbar-item">Log In</a> -->
       {/if}
     </div>
   </div>
@@ -92,11 +83,4 @@
   nav .navbar-brand .navbar-item {
     font-weight: bold;
   }
-
-  .navbar-end .navbar-dropdown {
-    left: -5em;
-  }
-
-  /* .is-current-page { */
-  /* } */
 </style>

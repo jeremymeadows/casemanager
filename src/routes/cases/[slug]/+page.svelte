@@ -3,7 +3,7 @@
   import Switch from "$lib/components/Switch.svelte";
   import axios from "axios";
 
-  export let data: { user: any, types: any, users: any, "case": any };
+  export let data;
 
   let edit = !data.case;
 
@@ -57,7 +57,7 @@
       .post("/api/cases", get_case())
       .then((res) => {
         console.log(res);
-        window.location.pathname = `/api/cases/${res.data}`;
+        window.location.pathname = `/cases/${res.data}`;
       })
       .catch((err) => {
         console.log(err);
@@ -107,7 +107,7 @@
         {/if}
       </div>
       <div class="field">
-        <label for="student-number">Student number</label>
+        <label for="student-number">Student Number</label>
         {#if edit}
           <div class="control has-icons-left">
             <input
@@ -136,7 +136,7 @@
       <br />
 
       <div class="field">
-        <label for="assignee">Assigned to</label>
+        <label for="assignee">Assigned To</label>
         {#if edit}
           <div class="select">
             <select id="assignee">
@@ -205,9 +205,9 @@
           <div class="select">
             <select id="contact-method">
               <option value="" selected={!data.case || !data.case.contact_method}>&mdash;</option>
-              <option selected={data.case?.contact_method === "Email"}>Email</option>
-              <option selected={data.case?.contact_method === "Phone"}>Phone</option>
-              <option selected={data.case?.contact_method === "In-Person"}>In-Person</option>
+              {#each data.contact_methods as contact_method}
+                <option selected={data.case?.contact_method === contact_method}>{contact_method}</option>
+              {/each}
             </select>
           </div>
         {:else}
