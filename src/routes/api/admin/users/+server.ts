@@ -72,10 +72,9 @@ export async function PATCH({
   } else {
     user_id = (await get_user(session_id)).user_id;
 
-    let res = await db.query(
-      "SELECT password FROM users WHERE user_id = $1",
-      [user_id]
-    );
+    let res = await db.query("SELECT password FROM users WHERE user_id = $1", [
+      user_id,
+    ]);
 
     if (!(await bcrypt.compare(data.old_password, res.rows[0]["password"]))) {
       throw error(403, "incorrect password");
@@ -84,10 +83,10 @@ export async function PATCH({
 
   password ??= random_string(8);
 
-  let res = await db.query("UPDATE users SET password = $1 WHERE user_id = $2 RETURNING email", [
-    await bcrypt.hash(password, await bcrypt.genSalt(10)),
-    user_id,
-  ]);
+  let res = await db.query(
+    "UPDATE users SET password = $1 WHERE user_id = $2 RETURNING email",
+    [await bcrypt.hash(password, await bcrypt.genSalt(10)), user_id]
+  );
 
   if (res.rowCount === 0) {
     throw error(404);
@@ -101,7 +100,7 @@ export async function PATCH({
   });
 }
 
-// new account
+// delete account
 export async function DELETE({
   request,
   cookies,
@@ -117,10 +116,10 @@ export async function DELETE({
 
   let { user_id } = await request.json();
 
-  await db.query(
-    "DELETE FROM users WHERE user_id = $1",
-    [user_id]
-  );
+  await db.query("UPDATE cases set assignee = NULL WHERE assignee = $1", [
+    user_id,
+  ]);
+  await db.query("DELETE FROM users WHERE user_id = $1", [user_id]);
 
   return json(true);
 }

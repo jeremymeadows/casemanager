@@ -6,6 +6,7 @@
 
   const users = data.users;
   let edit_id = "";
+  let delete_id = -1;
 
   function edit(event: MouseEvent) {
     edit_id = (event.target as HTMLButtonElement).getAttribute("data-for")!;
@@ -83,6 +84,19 @@
         console.log(err);
       });
   }
+
+  function remove(user_id: number) {
+    axios
+      .delete("/api/admin/users", { data: {
+        user_id: user_id,
+      }})
+      .then((_res: any) => {
+        document.location.reload();
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }
 </script>
 
 <article>
@@ -112,6 +126,13 @@
                 >
                   Edit
                 </button>
+                <button
+                  class="button is-small is-danger"
+                  data-for={user.user_id}
+                  on:click={() => { delete_id = user.user_id; open_dialog_modal('delete-user'); }}
+                >
+                  Delete
+                </button>
               </span>
             </td>
           </tr>
@@ -123,7 +144,7 @@
               <input id="{user.user_id}-admin" type="checkbox" checked={user.is_admin} />
             </td>
             <td>
-              <div class="buttons has-addons">
+              <span class="buttons has-addons">
                 <button
                   class="button is-small is-success"
                   on:click={save}
@@ -142,7 +163,7 @@
                 >
                   Cancel
                 </button>
-              </div>
+              </span>
             </td>
           </tr>
         {/each}
@@ -174,7 +195,7 @@
     <button class="button" on:click={add} disabled={!!edit_id}>Add User</button>
 
     <dialog id="password-confirm">
-      <h2>Are you sure you want to reset the password?</h2>
+      <h2>Are you sure you want to reset the password for <code>{users.find((e) => e.user_id == edit_id)?.name}</code>?</h2>
       <br />
       <div class="center">
         <button
@@ -201,6 +222,28 @@
       <br />
       <button class="button center" on:click={close_dialog}>Close</button>
     </dialog>
+
+    <dialog id="delete-user">
+      <h2>Are you sure you want to delete the user <code>{users.find((e) => e.user_id === delete_id)?.name}</code>?</h2>
+      <br />
+      <div class="center">
+        <button
+          class="button"
+          on:click={(ev) => { close_dialog(ev); cancel(); }}
+        >
+          No
+        </button>
+        <button
+          class="button is-danger"
+          on:click={(ev) => {
+            close_dialog(ev);
+            remove(delete_id);
+          }}
+        >
+          Yes
+        </button>
+      </div>
+    </dialog>
   </section>
 </article>
 
@@ -211,11 +254,19 @@
   }
 
   th:nth-child(1) {
-    width: 20%
+    width: 25%
   }
 
   th:nth-child(2) {
-    width: 40%
+    width: 30%
+  }
+
+  th:nth-child(3) {
+    width: 15%
+  }
+
+  th:nth-child(4) {
+    width: 20%
   }
 
   tr:hover {

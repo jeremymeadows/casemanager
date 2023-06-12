@@ -30,6 +30,10 @@ nav#navbar {
   text-align: center;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .hidden {
   display: none;
 }
@@ -95,6 +99,10 @@ aside:not(.menu) {
 
 aside a:hover {
   color: var(--fg);
+}
+
+code, pre {
+  color: var(--secondary);
 }
 
 [data-tooltip] {
