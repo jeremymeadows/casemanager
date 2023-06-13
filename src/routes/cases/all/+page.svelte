@@ -169,12 +169,20 @@
     gap: 0.5rem;
   }
 
+  section {
+    overflow: auto;
+  }
+
   th:not(:nth-child(2)), tr {
     cursor: pointer;
   }
 
   th:hover:not(:nth-child(2)) {
     background-color: var(--bg-shaded);
+  }
+
+  .sorted {
+    position: relative;
   }
 
   .sorted::after {

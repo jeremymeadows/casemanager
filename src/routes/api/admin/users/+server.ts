@@ -116,6 +116,10 @@ export async function DELETE({
 
   let { user_id } = await request.json();
 
+  if (user_id === 1) {
+    throw error(409, "cannot delete the main site admin");
+  }
+
   await db.query("UPDATE cases set assignee = NULL WHERE assignee = $1", [
     user_id,
   ]);

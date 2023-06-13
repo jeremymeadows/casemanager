@@ -19,10 +19,9 @@
         document.location.href = "/";
       })
       .catch((err: any) => {
-        console.log(err);
         let message = document.querySelector("#error-message")! as HTMLDivElement;
         message.hidden = false;
-        message.querySelector('span')!.textContent = err.response.data.message;
+        message.querySelector("span")!.textContent = err.response.data.message;
       })
       .finally(() => {
         form
@@ -60,7 +59,7 @@
 
   <aside class="narrow">
     The admin of this site must grant new users access. If you need an account
-    or forgot your password contact the office at <a
+    or forgot your password, contact the office at <a
       href="mailto:generalmanager@dkitsu.ie">generalmanager@dkitsu.ie</a
     >.
   </aside>

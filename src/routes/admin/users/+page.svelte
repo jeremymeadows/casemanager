@@ -103,7 +103,7 @@
   <h1>Users</h1>
 
   <section>
-    <table id="users" class="table">
+    <table id="users" class="table is-hoverable is-fullwidth">
       <thead>
         <th>Name</th>
         <th>Email</th>
@@ -126,13 +126,15 @@
                 >
                   Edit
                 </button>
-                <button
-                  class="button is-small is-danger"
-                  data-for={user.user_id}
-                  on:click={() => { delete_id = user.user_id; open_dialog_modal('delete-user'); }}
-                >
-                  Delete
-                </button>
+                {#if user.user_id !== 1}
+                  <button
+                    class="button is-small is-danger"
+                    data-for={user.user_id}
+                    on:click={() => { delete_id = user.user_id; open_dialog_modal('delete-user'); }}
+                  >
+                    Delete
+                  </button>
+                {/if}
               </span>
             </td>
           </tr>
@@ -141,7 +143,7 @@
             <td><input id="{user.user_id}-email" class="input" type="email" value={user.email} /></td>
             <td>
               Administrator:
-              <input id="{user.user_id}-admin" type="checkbox" checked={user.is_admin} />
+              <input id="{user.user_id}-admin" type="checkbox" checked={user.is_admin} disabled={user.user_id === 1} />
             </td>
             <td>
               <span class="buttons has-addons">
@@ -269,9 +271,9 @@
     width: 20%
   }
 
-  tr:hover {
-    background-color: var(--bg-alt);
-  }
+  /* tr:hover { */
+  /*   background-color: var(--bg-alt); */
+  /* } */
 
   td {
     vertical-align: middle;

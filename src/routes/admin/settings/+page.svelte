@@ -38,10 +38,16 @@
   }
 
   function remove(type: string, subtype: string | null = null) {
-    let conf = document.getElementById('delete-confirm-type') as HTMLDialogElement;
+    let conf = document.getElementById(
+      "delete-confirm-type"
+    ) as HTMLDialogElement;
     conf.showModal();
 
-   (document.querySelector('#delete-confirm-type button[value="delete"]') as HTMLButtonElement).onclick = () => {
+    (
+      document.querySelector(
+        '#delete-confirm-type button[value="delete"]'
+      ) as HTMLButtonElement
+    ).onclick = () => {
       let res = subtype
         ? axios.patch("/api/admin/settings", { type: type, subtype: subtype })
         : axios.delete("/api/admin/settings", { data: { type: type } });
@@ -61,9 +67,12 @@
   }
 
   function add_contact_method() {
-    let method = (document.getElementById('new-contact-method') as HTMLInputElement).value;
+    let method = (
+      document.getElementById("new-contact-method") as HTMLInputElement
+    ).value;
+
     if (editing === "") {
-      editing = 'new-contact-method';
+      editing = "new-contact-method";
     } else {
       let res = axios.post("/api/admin/settings/contact", { method: method });
       res
@@ -78,11 +87,19 @@
   }
 
   function remove_contact_method(method: string) {
-    let conf = document.getElementById('delete-confirm-contact') as HTMLDialogElement;
+    let conf = document.getElementById(
+      "delete-confirm-contact"
+    ) as HTMLDialogElement;
     conf.showModal();
 
-   (document.querySelector('#delete-confirm-contact button[value="delete"]') as HTMLButtonElement).onclick = () => {
-      let res = axios.delete("/api/admin/settings/contact", { data: { method: method } });
+    (
+      document.querySelector(
+        '#delete-confirm-contact button[value="delete"]'
+      ) as HTMLButtonElement
+    ).onclick = () => {
+      let res = axios.delete("/api/admin/settings/contact", {
+        data: { method: method },
+      });
       res
         .then(() => {
           editing = "";
@@ -215,13 +232,13 @@
           {#each data.contact_methods as contact_method}
             <li>
               <h3>
-                  <button
-                    class="is-danger"
-                    title="remove type"
-                    on:click={() => remove_contact_method(contact_method)}
-                  >
-                    <i class="bx bx-minus" />
-                  </button>
+                <button
+                  class="is-danger"
+                  title="remove type"
+                  on:click={() => remove_contact_method(contact_method)}
+                >
+                  <i class="bx bx-minus" />
+                </button>
                 {contact_method}
               </h3>
             </li>
@@ -255,8 +272,6 @@
       </div>
     </div>
   </section>
-
-  <button on:click={() => open_dialog_modal('delete-confirm-type')}>test</button>
 
   <dialog id="delete-confirm-type">
     <h2>Are you sure you want to delete this case type?</h2>
