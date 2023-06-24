@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS pins;
 DROP TABLE IF EXISTS cases;
 DROP TABLE IF EXISTS contact;
 DROP TABLE IF EXISTS subtypes;
@@ -41,6 +42,7 @@ CREATE TABLE contact (
 
 CREATE TABLE cases (
   case_id SERIAL NOT NULL,
+  new BOOLEAN NOT NULL DEFAULT TRUE,
   name VARCHAR(32) NOT NULL,
   student_number VARCHAR(6),
   type VARCHAR(32),
@@ -55,6 +57,14 @@ CREATE TABLE cases (
   FOREIGN KEY (assignee) REFERENCES users (user_id),
   FOREIGN KEY (type, subtype) REFERENCES subtypes (parent, name),
   FOREIGN KEY (contact_method) REFERENCES contact (method)
+);
+
+CREATE TABLE pins (
+  user_id INTEGER NOT NULL,
+  case_id INTEGER NOT NULL,
+  PRIMARY KEY (user_id, case_id),
+  FOREIGN KEY (user_id) REFERENCES users (user_id),
+  FOREIGN KEY (case_id) REFERENCES cases (case_id)
 );
 
 

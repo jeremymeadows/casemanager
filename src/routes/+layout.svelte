@@ -19,13 +19,12 @@
   <title>DkIT SU Case Manager</title>
 
   <meta name="author" content="Jeremy Meadows" />
-  <meta name="url" content="https://dkitsu.com/" />
 </svelte:head>
 
 <Navbar {user} />
 
 {#if user}
-  <Sidebar admin={user.is_admin} />
+  <Sidebar admin={user.is_admin} has_new={data.has_new_cases} />
 {/if}
 
 <main>

@@ -1,8 +1,10 @@
 import { json } from "@sveltejs/kit";
-import { db } from "$lib/server/database";
+import { db, get_user } from "$lib/server/database";
+import { get_session } from "$lib/utils/auth";
 
-export async function POST({ request }: { request: any }) {
+export async function POST({ cookies, request }: { cookies: any, request: any }) {
   const data = await request.json();
+  await get_user(get_session(cookies));
 
   let res = await db.query(
     `
@@ -26,26 +28,28 @@ export async function POST({ request }: { request: any }) {
   return json(res.rows[0].case_id);
 }
 
-export async function PUT({ request }: { request: any }) {
+export async function PUT({ cookies, request }: { cookies: any, request: any }) {
   const data = await request.json();
-  console.log(data)
+  await get_user(get_session(cookies));
 
   await db.query(
     `
       UPDATE cases SET
         name = $1,
-        student_number = $2,
-        type = $3,
-        subtype = $4,
-        assignee = $5,
-        is_open = $6,
-        description = $7,
-        contact_method = $8,
-        closed = $9
-      WHERE case_id = $10
+        new = $2,
+        student_number = $3,
+        type = $4,
+        subtype = $5,
+        assignee = $6,
+        is_open = $7,
+        description = $8,
+        contact_method = $9,
+        closed = $10
+      WHERE case_id = $11
     `,
     [
       data.name,
+      data.new,
       data.student_number,
       data.type,
       data.subtype,
@@ -59,4 +63,15 @@ export async function PUT({ request }: { request: any }) {
   );
 
   return json(true);
+}
+
+export async function PATCH({ cookies, request }: { cookies: any, request: any }) {
+  const data = await request.json();
+  await get_user(get_session(cookies));
+
+  if (data.pin) {
+    await db.query("INSERT INTO pins (user_id, case_id) VALUES ($1, $2)", [data.user_id, data.case_id])
+  } else {
+    await db.query("DELETE FROM pins WHERE user_id = $1 AND case_id = $2", [data.user_id, data.case_id])
+  }
 }

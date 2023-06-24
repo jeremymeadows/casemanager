@@ -8,6 +8,7 @@
   export let data;
 
   let cases = data.cases;
+  let pins = data.pins;
   let mounted = false;
 
   let search = '';
@@ -16,6 +17,7 @@
 
   let status_filter = 'Open';
   let type_filter: string[] = [];
+  let owner_filter: string[] = [];
 
   let columns = [
     { field: 'case_id', name: '#' },
@@ -26,9 +28,8 @@
     { field: 'student_number', name: 'Student Number' },
     { field: 'type', name: 'Type' },
     { field: 'subtype', name: 'Subtype' },
-    { field: 'assignee', name: 'Owner' },
     { field: 'contact_method', name: 'Contact Method' },
-  ];
+  ].concat(data.user.is_admin ? [{ field: 'assignee', name: 'Owner' }] : []);
   let view_columns = ['status', 'created', 'name', 'type'].concat(data.user.is_admin ? ['assignee'] : []);
 
   function sort(field: string) {
@@ -68,8 +69,14 @@
     document.querySelector('thead.loading').classList.remove('loading');
 
     document.querySelectorAll("[data-href]").forEach((e) => {
+      let url = e.getAttribute("data-href")!;
+
       e.addEventListener("click", () => {
-        window.location.pathname = e.getAttribute("data-href")!;
+        window.location.pathname = url;
+      });
+
+      e.addEventListener("auxclick", () => {
+        window.open(url, "_blank");
       });
     });
     await sleep(1000);
@@ -98,7 +105,15 @@
       <SelectListItem value="">None</SelectListItem>
     </SelectList>
 
-    <SelectList id="view-columns" label="Columns" bind:selection={view_columns}>
+    {#if data.user.is_admin}
+      <SelectList id="owner-filter" label="Owner" bind:selection={owner_filter}>
+        {#each data.users as { user_id, name }}
+          <SelectListItem value={user_id} selected={owner_filter.includes(String(user_id))}>{name}</SelectListItem>
+        {/each}
+      </SelectList>
+    {/if}
+
+    <SelectList id="view-columns" label="Columns" indicator={false} bind:selection={view_columns}>
       {#each columns as { field, name }}
         <SelectListItem value={field} selected={view_columns.includes(field)}>{name}</SelectListItem>
       {/each}
@@ -110,9 +125,10 @@
   <section>
     <table id="summary" class="table is-hoverable is-fullwidth">
       <thead class="loading">
+        <th class="indicators status" />
         {#each columns as { field, name }}
           {#if field === 'status'}
-            <th hidden={!view_columns.includes(field)}>Status</th>
+            <th class="status" hidden={!view_columns.includes(field)}>Status</th>
           {:else}
             <th
               hidden={!view_columns.includes(field)}
@@ -129,6 +145,8 @@
         {#each cases as c}
           <tr
             data-href={`/cases/${c.case_id}`}
+            class:new={c.new && c.user_id === data.user.user_id}
+            class:pin={pins.includes(c.case_id)}
             class:closed={!c.is_open}
             class:filtered={
               !(
@@ -139,6 +157,10 @@
                 (
                   type_filter.length === 0 ||
                   type_filter.includes(c.type ?? '')
+                ) &&
+                (
+                  owner_filter.length === 0 ||
+                  owner_filter.includes(String(c.user_id))
                 )
               )
             }
@@ -153,8 +175,8 @@
             <td hidden={!view_columns.includes('student_number')}><span class="d-number">D00</span>{c.student_number}</td>
             <td hidden={!view_columns.includes('type')}>{c.type ?? 'None'}</td>
             <td hidden={!view_columns.includes('subtype')}>{c.subtype ?? 'None'}</td>
-            <td hidden={!view_columns.includes('assignee')}>{c.assignee ?? 'Unassigned'}</td>
             <td hidden={!view_columns.includes('contact_method')}>{c.contact_method ?? 'N/A'}</td>
+            <td hidden={!view_columns.includes('assignee')}>{c.assignee ?? 'Unassigned'}</td>
           </tr>
         {/each}
       </tbody>
@@ -173,12 +195,35 @@
     overflow: auto;
   }
 
-  th:not(:nth-child(2)), tr {
+  th:not(.status), tr {
     cursor: pointer;
   }
 
-  th:hover:not(:nth-child(2)) {
+  th:hover:not(.status) {
     background-color: var(--bg-shaded);
+  }
+
+  th.indicators {
+    width: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  tr::before {
+    content: '';
+    display: inline-block;
+    border-radius: 100%;
+    width: 0.5em;
+    height: 0.5em;
+    transform: translateY(0.4em);
+  }
+
+  tr.pin::before {
+    background-color: var(--blue);
+  }
+
+  tr.new::before {
+    background-color: var(--red);
   }
 
   .sorted {

@@ -3,6 +3,7 @@
   import { navigating } from "$app/stores";
 
   export let admin: boolean;
+  export let has_new: boolean;
 
   onMount(() => {
     document
@@ -25,7 +26,11 @@
   </ul>
   <p class="menu-label">Cases</p>
   <ul class="menu-list">
-    <li><a href="/cases/all">All Cases</a></li>
+    <li>
+      <a href="/cases/all" data-sveltekit-reload>
+        All Cases<span class="tag" hidden={!has_new}>New</span>
+      </a>
+    </li>
     <li><a href="/cases/new">New Case</a></li>
   </ul>
   {#if admin}
@@ -49,5 +54,14 @@
     padding: 4rem 1rem;
     height: 100vh;
     width: $sidebar-width;
+  }
+
+  .tag {
+    color: white;
+    font-size: 0.5em;
+    background-color: var(--red);
+    margin-left: 1em;
+    position: relative;
+    top: -0.5em;
   }
 </style>

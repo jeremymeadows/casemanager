@@ -56,7 +56,6 @@
     axios
       .post("/api/cases", get_case())
       .then((res) => {
-        console.log(res);
         window.location.pathname = `/cases/${res.data}`;
       })
       .catch((err) => {
@@ -77,6 +76,7 @@
     axios
       .put("/api/cases", {
         case_id: data.case.case_id,
+        new: data.case.assignee != new_case.assignee,
         closed: closed,
         ...new_case
       })
@@ -91,7 +91,9 @@
 
 <article>
   {#if data.case}
-    <a id="back" class="button is-small" href="/cases/all"><i class='bx bx-chevron-left' /> Back</a>
+    <a id="back" class="button is-small" href="/cases/all" data-sveltekit-reload>
+      <i class='bx bx-chevron-left' />&nbsp;Back
+    </a>
   {/if}
 
   <h1>{data.case ? `Case #${data.case.case_id}` : 'New Case'}</h1>

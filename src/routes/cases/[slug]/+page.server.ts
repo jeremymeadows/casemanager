@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { db } from "$lib/server/database";
+import { db, get_user } from "$lib/server/database";
 import { get_session } from "$lib/utils/auth";
 
 export async function load({
@@ -36,6 +36,10 @@ export async function load({
 
   if (res.rowCount === 0) {
     throw error(404, "There is no case matching the specified id.");
+  }
+
+  if (res.rows[0].new && res.rows[0].assignee === (await get_user(session_id)).user_id) {
+    db.query("UPDATE cases SET new = FALSE WHERE case_id = $1", [params.slug]);
   }
 
   return {

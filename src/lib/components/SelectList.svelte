@@ -7,6 +7,7 @@
   export let id: string;
   export let label: string = "Select";
   export let multiple: boolean = true;
+  export let indicator: boolean = true;
   export let selection: string[] | string | null = multiple ? [] : null;
 
   let component_id = id ?? `s-${random_string(12)}`;
@@ -48,6 +49,8 @@
   <div class="dropdown-trigger">
     <button
       class="button"
+      class:selected={multiple && selection.length > 0}
+      class:indicator={indicator}
       aria-haspopup="true"
       aria-controls="dropdown-menu"
       on:click={toggle}
@@ -66,3 +69,9 @@
     </form>
   </div>
 </div>
+
+<style>
+  .dropdown .dropdown-trigger .button.selected.indicator {
+    border-color: var(--blue);
+  }
+</style>

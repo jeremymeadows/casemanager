@@ -262,7 +262,7 @@
   <section>
     <div class="columns">
       <div class="column box">
-        <label for="type-chart">Cases By Type<aside><Switch id="open-filter" left="all" right="open"/></aside></label>
+        <label for="type-chart">Cases By Type<aside><Switch id="open-filter" left="all" right="open" /></aside></label>
         <canvas id="type-chart" />
       </div>
       <div class="column box">

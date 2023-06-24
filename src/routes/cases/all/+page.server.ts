@@ -8,7 +8,9 @@ export async function load({ cookies }: { cookies: any }) {
     `
       SELECT
         case_id,
+        new,
         cases.name,
+        assignee AS user_id,
         student_number,
         is_open,
         type,
@@ -31,7 +33,10 @@ export async function load({ cookies }: { cookies: any }) {
     [session_id]
   );
 
+  let pins = await db.query("SELECT case_id FROM pins WHERE user_id = (SELECT user_id FROM sessions WHERE session_id = $1)", [session_id]);
+
   return {
     cases: cases.rows,
+    pins: pins.rows.map((e) => e.case_id),
   };
 }

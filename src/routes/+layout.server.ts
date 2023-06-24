@@ -28,12 +28,19 @@ export async function load({
     if (url !== "/auth/login") {
       throw redirect(307, "/auth/login");
     }
+
+    return;
   } else if (url === "/auth/login") {
     throw redirect(307, "/");
   }
 
   let users = await db.query(
     "SELECT user_id, name, email FROM users ORDER BY user_id"
+  );
+
+  let new_cases = await db.query(
+    "SELECT COUNT(*) AS count FROM cases WHERE assignee = $1 AND new = TRUE",
+    [user.rows[0].user_id]
   );
 
   let types = await db.query(`
@@ -52,6 +59,7 @@ export async function load({
 
   return {
     user: user.rows[0],
+    has_new_cases: new_cases.rows[0].count > 0,
     users: users.rows,
     types: types.rows.reduce(
       (acc, val) => (
