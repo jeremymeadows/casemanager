@@ -38,7 +38,11 @@ export async function load({
     throw error(404, "There is no case matching the specified id.");
   }
 
+  let uid = (await get_user(session_id)).user_id;
+  console.log(uid);
+  console.log(res.rows[0].assignee);
   if (res.rows[0].new && res.rows[0].assignee === (await get_user(session_id)).user_id) {
+    console.log("Marking case as read");
     db.query("UPDATE cases SET new = FALSE WHERE case_id = $1", [params.slug]);
   }
 

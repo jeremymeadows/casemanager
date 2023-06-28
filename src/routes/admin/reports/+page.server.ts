@@ -8,11 +8,30 @@ export async function load({ cookies }: { cookies: any }) {
     throw error(403, "cannot access reports");
   }
 
-  let users = await db.query(
-    "SELECT user_id, name, email, is_admin FROM users ORDER BY user_id"
+  let cases = await db.query(
+    `
+      SELECT
+        case_id,
+        cases.name,
+        is_open,
+        type,
+        subtype,
+        created,
+        closed,
+        users.name as assignee
+      FROM cases
+      LEFT JOIN users ON cases.assignee = users.user_id
+      WHERE
+        CASE
+          WHEN (SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1)
+            THEN TRUE
+            ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1) OR assignee IS NULL
+        END
+      `,
+    [session_id]
   );
 
   return {
-    users: users.rows,
+    cases: cases.rows,
   };
 }

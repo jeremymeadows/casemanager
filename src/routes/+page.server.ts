@@ -2,7 +2,7 @@ import { db } from "$lib/server/database";
 import { get_session } from "$lib/utils/auth";
 
 export async function load({ cookies }: { cookies: any }) {
-  let session_id = get_session(cookies);
+  const session_id = get_session(cookies);
 
   let cases = await db.query(
     `

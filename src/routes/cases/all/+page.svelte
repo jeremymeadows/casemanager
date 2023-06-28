@@ -8,7 +8,7 @@
   export let data;
 
   let cases = data.cases;
-  let pins = data.pins;
+  // let pins = data.pins;
   let mounted = false;
 
   let search = '';
@@ -72,6 +72,8 @@
       let url = e.getAttribute("data-href")!;
 
       e.addEventListener("click", () => {
+        console.log(url);
+        console.log(e);
         window.location.pathname = url;
       });
 
@@ -146,7 +148,6 @@
           <tr
             data-href={`/cases/${c.case_id}`}
             class:new={c.new && c.user_id === data.user.user_id}
-            class:pin={pins.includes(c.case_id)}
             class:closed={!c.is_open}
             class:filtered={
               !(
@@ -218,9 +219,9 @@
     transform: translateY(0.4em);
   }
 
-  tr.pin::before {
-    background-color: var(--blue);
-  }
+  /* tr.pin::before { */
+  /*   background-color: var(--blue); */
+  /* } */
 
   tr.new::before {
     background-color: var(--red);
