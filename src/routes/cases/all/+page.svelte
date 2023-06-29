@@ -69,16 +69,16 @@
     document.querySelector('thead.loading').classList.remove('loading');
 
     document.querySelectorAll("[data-href]").forEach((e) => {
-      let url = e.getAttribute("data-href")!;
+      // const url = e.getAttribute("data-href")!;
 
       e.addEventListener("click", () => {
-        console.log(url);
-        console.log(e);
-        window.location.pathname = url;
+        // window.location.pathname = url;
+        window.location.pathname = e.getAttribute("data-href")!;
       });
 
       e.addEventListener("auxclick", () => {
-        window.open(url, "_blank");
+        // window.open(url, "_blank");
+        window.open(e.getAttribute("data-href")!, "_blank");
       });
     });
     await sleep(1000);

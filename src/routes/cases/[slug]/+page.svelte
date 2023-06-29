@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { dtfmt } from "$lib/utils/dates";
   import Switch from "$lib/components/Switch.svelte";
   import axios from "axios";
@@ -87,6 +88,12 @@
         console.log(err);
       });
   }
+
+  onMount(() => {
+    if (data.case.new) {
+      document.location.reload();
+    }
+  });
 </script>
 
 <article>
