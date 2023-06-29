@@ -69,19 +69,15 @@
     document.querySelector('thead.loading').classList.remove('loading');
 
     document.querySelectorAll("[data-href]").forEach((e) => {
-      // const url = e.getAttribute("data-href")!;
-
       e.addEventListener("click", () => {
-        // window.location.pathname = url;
         window.location.pathname = e.getAttribute("data-href")!;
       });
 
       e.addEventListener("auxclick", () => {
-        // window.open(url, "_blank");
         window.open(e.getAttribute("data-href")!, "_blank");
       });
     });
-    await sleep(1000);
+    await sleep(500);
     document.querySelector('tbody.loading').classList.remove('loading');
 
     document.querySelector('.loading-icon').remove();

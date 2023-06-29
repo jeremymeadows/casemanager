@@ -90,7 +90,7 @@
   }
 
   onMount(() => {
-    if (data.case.new) {
+    if (data.case?.new) {
       document.location.reload();
     }
   });

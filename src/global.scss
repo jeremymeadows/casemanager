@@ -146,3 +146,21 @@ code, pre {
 [data-tooltip]:hover::after {
   display: block;
 }
+
+@media print {
+  nav#navbar,
+  aside.menu {
+    display: none;
+  }
+
+  body,
+  body:has(#sidebar) {
+    margin: 0;
+    padding: 0;
+  }
+
+  main {
+    padding-top: 0;
+  }
+}
+

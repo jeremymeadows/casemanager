@@ -16,6 +16,7 @@ export async function load({ cookies }: { cookies: any }) {
         is_open,
         type,
         subtype,
+        contact_method,
         created,
         closed,
         users.name as assignee

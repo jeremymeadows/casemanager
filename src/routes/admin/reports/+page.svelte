@@ -10,6 +10,7 @@
   export let data;
   const cases = data.cases;
   const types = data.types;
+  const contact_methods = data.contact_methods;
 
   function draw_charts() {
     let options: object = {
@@ -266,6 +267,26 @@
       });
   }
 
+  function draw_contact_methods() {
+    let options: object = {
+      animation: {
+        duration: 0,
+      },
+    };
+
+    return new Chart(document.getElementById("contact-method-chart") as HTMLCanvasElement, {
+      type: "pie",
+      data: {
+        labels: [...contact_methods, 'N/A'],
+        datasets: [{
+          label: "",
+          data: [...contact_methods, null].map((method) => cases.filter((e) => e.contact_method === method).length),
+        }],
+      },
+      options: options,
+    });
+  }
+
   onMount(async () => {
     let initial_time = localStorage.getItem("timeline")?.split(";");
     (document.getElementById("date-start")! as HTMLInputElement).value = dtfmt(
@@ -287,6 +308,7 @@
     let charts = draw_charts();
     let timeline = draw_timeline();
     let bar = draw_bar();
+    let contact = draw_contact_methods();
 
     document.getElementById('open-filter')?.addEventListener('click', () => {
       charts.forEach((chart) => chart.destroy());
@@ -302,6 +324,9 @@
 
       bar.destroy();
       bar = draw_bar();
+
+      contact.destroy();
+      contact = draw_contact_methods();
     });
 
     document
@@ -328,6 +353,10 @@
       <div class="column box">
         <label for="assignee-chart">Open Cases By Assignee</label>
         <canvas id="assignee-chart" />
+      </div>
+      <div class="column box">
+        <label for="contact-method-chart">Contact Methods</label>
+        <canvas id="contact-method-chart" />
       </div>
     </div>
 
