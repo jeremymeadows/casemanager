@@ -30,6 +30,10 @@
     }
   }
 
+  // export function reset(target: HTMLElement) {
+  //   target.querySelectorAll('input:checked').forEach((e) => (e as HTMLInputElement).checked = false);
+  // }
+
   onMount(() => {
     document.querySelectorAll(`#${component_id} form input`).forEach((el) => {
       let input = el as HTMLInputElement;

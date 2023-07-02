@@ -81,8 +81,8 @@
         closed: closed,
         ...new_case
       })
-      .then((res) => {
-        console.log(res);
+      .then((_) => {
+        document.location.reload();
       })
       .catch((err) => {
         console.log(err);
@@ -90,7 +90,7 @@
   }
 
   onMount(() => {
-    if (data.case?.new) {
+    if (data.case?.assignee && data.case?.new) {
       document.location.reload();
     }
   });

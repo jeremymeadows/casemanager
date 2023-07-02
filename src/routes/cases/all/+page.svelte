@@ -54,6 +54,45 @@
     localStorage.setItem('sorting', `${sort_method};${sort_reversed}`);
   }
 
+  function matches_filter(c: any) {
+    return !(
+      c.is_open && status_filter === 'Closed' ||
+      !c.is_open && status_filter === 'Open'
+    ) && (
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.description.toLowerCase().includes(search.toLowerCase())
+    ) && (
+      type_filter.length === 0 ||
+      type_filter.includes(c.type ?? '')
+    ) && (
+      owner_filter.length === 0 ||
+      owner_filter.includes(String(c.user_id))
+    );
+  }
+
+  // function reset_filters() {
+  //   // status_filter = 'Open';
+  //   // type_filter = [];
+  //   // owner_filter = [];
+  //   document.querySelectorAll('input:checked').forEach((e) => e.checked = false);
+  // }
+
+  function export_data() {
+    let a = document.createElement('a');
+    let data_columns = view_columns.map((e) => e === 'status' ? 'is_open' : e)
+
+    a.download = 'data.csv';
+    a.href = `data:text/csv;charset=UTF-8,\uFEFF${data_columns.map((e) => e.replace('_', ' ')).join(',')}\n` + encodeURIComponent(
+      cases.filter(matches_filter).map((c) =>
+        data_columns.map((col) =>
+          c[col]?.toString().replace(',', '')
+        ).join(',')
+      ).join('\n')
+    );
+    a.dispatchEvent(new MouseEvent('click'));
+    a.remove();
+  }
+
   $: if (mounted) {
     localStorage.setItem('view_columns', view_columns.join(';'));
   };
@@ -117,6 +156,10 @@
       {/each}
     </SelectList>
   </div>
+  <div>
+    <!-- <button class="button" on:click={reset_filters}>Reset Filters</button> -->
+    <button class="button" on:click={export_data}>Export Data</button>
+  </div>
 
   <br />
 
@@ -145,24 +188,8 @@
             data-href={`/cases/${c.case_id}`}
             class:new={c.new && c.user_id === data.user.user_id}
             class:closed={!c.is_open}
-            class:filtered={
-              !(
-                (
-                  c.name.toLowerCase().includes(search.toLowerCase()) ||
-                  c.description.toLowerCase().includes(search.toLowerCase())
-                ) &&
-                (
-                  type_filter.length === 0 ||
-                  type_filter.includes(c.type ?? '')
-                ) &&
-                (
-                  owner_filter.length === 0 ||
-                  owner_filter.includes(String(c.user_id))
-                )
-              )
-            }
+            class:filtered={!matches_filter(c) && (status_filter || type_filter || owner_filter || true)}
             title={c.description}
-            hidden={c.is_open && status_filter === 'Closed' || !c.is_open && status_filter === 'Open'}
           >
             <td hidden={!view_columns.includes('case_id')}>{c.case_id}</td>
             <td hidden={!view_columns.includes('status')}>{c.is_open ? "Open" : "Closed"}</td>
