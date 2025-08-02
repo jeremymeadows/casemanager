@@ -1,7 +1,7 @@
 <script lang="ts">
   import axios from "axios";
 
-  export let data;
+  const { data } = $props();
 
   function logout_all() {
 
@@ -60,6 +60,7 @@
   }
 
   function start_change_password(ev: MouseEvent) {
+    ev.preventDefault();
     (ev.target as HTMLDivElement).parentElement.hidden = true;
     document.getElementById('change-password').hidden = false;
   }
@@ -86,24 +87,24 @@
   <div>
     <button
       class="button center"
-      on:click={start_change_password}
+      onclick={start_change_password}
     >
       Change Password
     </button>
   </div>
 
-  <form id="change-password" class="narrow" on:submit|preventDefault={change_password} hidden>
+  <form id="change-password" class="narrow" onsubmit={change_password} hidden>
     <div class="field">
       <label for="old">Old Password</label>
-      <input id="old" type="password" class="input" on:input={check_password} required />
+      <input id="old" type="password" class="input" oninput={check_password} required />
     </div>
     <div class="field">
       <label for="new">New Password</label>
-      <input id="new" type="password" class="input" on:input={check_password} required />
+      <input id="new" type="password" class="input" oninput={check_password} required />
     </div>
     <div class="field">
       <label for="new-conf">Confirm New Password</label>
-      <input id="new-conf" type="password" class="input" on:input={check_password} required />
+      <input id="new-conf" type="password" class="input" oninput={check_password} required />
     </div>
     <input id="submit" type="submit" class="button center is-danger" value="Change Password" disabled />
   </form>

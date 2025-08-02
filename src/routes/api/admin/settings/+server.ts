@@ -1,5 +1,5 @@
 import { json, error } from "@sveltejs/kit";
-import { db, is_admin } from "$lib/server/database";
+import { db } from "$lib/server/database";
 
 export async function POST({
   request,
@@ -9,14 +9,14 @@ export async function POST({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify app settings");
   }
 
   let { type } = await request.json();
-
-  await db.query("INSERT INTO types (name) VALUES ($1)", [type]);
+  db.add_type(type);
 
   return json(true);
 }
@@ -29,17 +29,14 @@ export async function PUT({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify app settings");
   }
 
   let { type, subtype } = await request.json();
-
-  await db.query("INSERT INTO subtypes (parent, name) VALUES ($1, $2)", [
-    type,
-    subtype,
-  ]);
+  db.add_subtype(type, subtype);
 
   return json(true);
 }
@@ -52,19 +49,14 @@ export async function PATCH({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify app settings");
   }
 
   let { type, subtype } = await request.json();
-
-  await db.query("UPDATE cases SET subtype = NULL WHERE subtype = $1", [subtype]);
-
-  await db.query("DELETE FROM subtypes WHERE parent = $1 AND name = $2", [
-    type,
-    subtype,
-  ]);
+  db.delete_subtype(type, subtype);
 
   return json(true);
 }
@@ -77,16 +69,14 @@ export async function DELETE({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify app settings");
   }
 
   let { type } = await request.json();
-
-  await db.query("UPDATE cases SET type = NULL WHERE type = $1", [type]);
-
-  await db.query("DELETE FROM types WHERE name = $1", [type]);
+  db.delete_type(type);
 
   return json(true);
 }

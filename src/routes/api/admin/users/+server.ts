@@ -1,7 +1,6 @@
 import { json, error } from "@sveltejs/kit";
-import { db, get_user, is_admin } from "$lib/server/database";
+import { db } from "$lib/server/database";
 import { random_string } from "$lib/utils/misc";
-import bcrypt from "bcrypt";
 
 // new account
 export async function POST({
@@ -12,19 +11,17 @@ export async function POST({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify user accounts");
   }
 
   let { name, email, admin } = await request.json();
 
-  let res = await db.query(
-    "INSERT INTO users (name, email, is_admin) VALUES ($1, $2, $3) RETURNING user_id",
-    [name, email, admin]
-  );
+  let id = db.add_user(name, email, admin);
 
-  return json(res.rows[0].user_id);
+  return json(id);
 }
 
 // sets a user's account details
@@ -36,18 +33,16 @@ export async function PUT({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify user accounts");
   }
 
   let data = await request.json();
   let { user_id, name, email, admin } = data;
 
-  await db.query(
-    "UPDATE users SET name = $1, email = $2, is_admin = $3 WHERE user_id = $4",
-    [name, email, admin, user_id]
-  );
+  db.update_user(user_id, name, email, admin);
 
   return json(true);
 }
@@ -76,7 +71,7 @@ export async function PATCH({
       user_id,
     ]);
 
-    if (!(await bcrypt.compare(data.old_password, res.rows[0]["password"]))) {
+    if (!(await Bun.password.verify(data.old_password, res.rows[0]["password"]))) {
       throw error(403, "incorrect password");
     }
   }
@@ -85,7 +80,7 @@ export async function PATCH({
 
   let res = await db.query(
     "UPDATE users SET password = $1 WHERE user_id = $2 RETURNING email",
-    [await bcrypt.hash(password, await bcrypt.genSalt(10)), user_id]
+    [await Bun.password.hash(password), user_id]
   );
 
   if (res.rowCount === 0) {
@@ -109,8 +104,9 @@ export async function DELETE({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify user accounts");
   }
 

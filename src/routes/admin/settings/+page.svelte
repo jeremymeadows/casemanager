@@ -2,9 +2,9 @@
   import axios from "axios";
   import { open_dialog_modal, close_dialog } from "$lib/utils/dialogs.js";
 
-  export let data;
+   const { data } = $props();
 
-  let editing = "";
+  let editing = $state("");
 
   function add(
     ev: MouseEvent,
@@ -133,7 +133,7 @@
                   <button
                     class="is-danger"
                     title="remove type"
-                    on:click={() => remove(type)}
+                    onclick={() => remove(type)}
                   >
                     <i class="bx bx-minus" />
                   </button>
@@ -155,7 +155,7 @@
                       <button
                         class="is-danger"
                         title="remove subtype"
-                        on:click={() => remove(type, subtype)}
+                        onclick={() => remove(type, subtype)}
                       >
                         <i class="bx bx-minus" />
                       </button>
@@ -175,7 +175,7 @@
                     title="cancel"
                     data-for="{type}-new-subtype"
                     hidden={!editing || editing !== `${type}-new-subtype`}
-                    on:click={cancel}
+                    onclick={cancel}
                   >
                     <i class="bx bx-x" />
                   </button>
@@ -184,7 +184,7 @@
                     title="new subtype"
                     data-for="{type}-new-subtype"
                     hidden={!!editing && editing !== `${type}-new-subtype`}
-                    on:click={(ev) =>
+                    onclick={(ev) =>
                       add(
                         ev,
                         type,
@@ -210,7 +210,7 @@
               title="cancel"
               data-for="new-type"
               hidden={!editing || editing !== "new-type"}
-              on:click={cancel}
+              onclick={cancel}
             >
               <i class="bx bx-x" />
             </button>
@@ -219,7 +219,7 @@
               title="new type"
               data-for="new-type"
               hidden={!!editing && editing !== "new-type"}
-              on:click={(ev) => add(ev, document.getElementById("new-type"))}
+              onclick={(ev) => add(ev, document.getElementById("new-type"))}
             >
               <i class="bx bx-plus" />
             </button>
@@ -235,7 +235,7 @@
                 <button
                   class="is-danger"
                   title="remove type"
-                  on:click={() => remove_contact_method(contact_method)}
+                  onclick={() => remove_contact_method(contact_method)}
                 >
                   <i class="bx bx-minus" />
                 </button>
@@ -255,7 +255,7 @@
               title="cancel"
               data-for="new-contact-method"
               hidden={!editing || editing !== `new-contact-method`}
-              on:click={cancel}
+              onclick={cancel}
             >
               <i class="bx bx-x" />
             </button>
@@ -263,7 +263,7 @@
             <button
               class="is-success"
               title="new type"
-              on:click={add_contact_method}
+              onclick={add_contact_method}
             >
               <i class="bx bx-plus" />
             </button>

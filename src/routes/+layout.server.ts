@@ -9,64 +9,61 @@ export async function load({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  
+  if (!session_id && new URL(request.url).pathname !== "/auth/login") {
+    console.log('no session')
+    throw redirect(307, "/auth/login");
+  }
+
+  const user = db.get_user(session_id);
   const url = new URL(request.url).pathname;
 
-  let user = await db.query(
-    "SELECT user_id, email, name, is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
-    [
-      /^([a-zA-Z0-9]){8}-(([a-zA-Z0-9]){4}-){3}([a-zA-Z0-9]){12}$/.test(
-        session_id
-      )
-        ? session_id
-        : null,
-    ]
-  );
-
-  if (user.rowCount === 0) {
-    cookies.delete("session");
+  if (!user.ok) {
+    cookies.delete("session", { path: "/" });
 
     if (url !== "/auth/login") {
       throw redirect(307, "/auth/login");
     }
-
-    return;
   } else if (url === "/auth/login") {
     throw redirect(307, "/");
   }
 
-  let users = await db.query(
-    "SELECT user_id, name, email FROM users ORDER BY user_id"
-  );
+  // let users = await db.query(
+  //   "SELECT user_id, name, email FROM users ORDER BY user_id"
+  // );
 
-  let new_cases = await db.query(
-    "SELECT COUNT(*) AS count FROM cases WHERE assignee = $1 AND new = TRUE",
-    [user.rows[0].user_id]
-  );
+  // let new_cases = await db.query(
+  //   "SELECT COUNT(*) AS count FROM cases WHERE assignee = $1 AND new = TRUE",
+  //   [user.rows[0].user_id]
+  // );
 
-  let types = await db.query(`
-    SELECT
-      types.name,
-      STRING_AGG(subtypes.name, ';') AS subtypes
-    FROM subtypes
-      RIGHT JOIN types ON subtypes.parent = types.name
-    GROUP BY types.name
-    ORDER BY types.name
-  `);
+  // let types = await db.query(`
+  //   SELECT
+  //     types.name,
+  //     STRING_AGG(subtypes.name, ';') AS subtypes
+  //   FROM subtypes
+  //     RIGHT JOIN types ON subtypes.parent = types.name
+  //   GROUP BY types.name
+  //   ORDER BY types.name
+  // `);
 
-  let contact_methods = await db.query(
-    "SELECT method FROM contact ORDER BY method"
-  );
+  // let contact_methods = await db.query(
+  //   "SELECT method FROM contact ORDER BY method"
+  // );
 
+  // return {
+  //   user: user.rows[0],
+  //   has_new_cases: new_cases.rows[0].count > 0,
+  //   users: users.rows,
+  //   types: types.rows.reduce(
+  //     (acc, val) => (
+  //       (acc[val.name] = val.subtypes ? val.subtypes.split(";") : []), acc
+  //     ),
+  //     {}
+  //   ),
+  //   contact_methods: contact_methods.rows.map((e) => e.method),
+  // };
   return {
-    user: user.rows[0],
-    has_new_cases: new_cases.rows[0].count > 0,
-    users: users.rows,
-    types: types.rows.reduce(
-      (acc, val) => (
-        (acc[val.name] = val.subtypes ? val.subtypes.split(";") : []), acc
-      ),
-      {}
-    ),
-    contact_methods: contact_methods.rows.map((e) => e.method),
-  };
+    types: db.get_case_types().expect(),
+  }
 }

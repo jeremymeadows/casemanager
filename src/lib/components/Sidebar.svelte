@@ -1,9 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { navigating } from "$app/stores";
+  import { navigating } from "$app/state";
 
-  export let admin: boolean;
-  export let has_new: boolean;
+  let { admin, has_new } = $props();
 
   onMount(() => {
     document
@@ -11,12 +10,14 @@
       ?.classList.add("is-active");
   });
 
-  $: if ($navigating) {
-    document.querySelector(".is-active")?.classList.remove("is-active");
-    document
-      .querySelector(`#sidebar a[href='${$navigating.to?.url.pathname}']`)
-      ?.classList.add("is-active");
-  }
+  $effect(() => {
+    if (navigating) {
+      document.querySelector(".is-active")?.classList.remove("is-active");
+      document
+        .querySelector(`#sidebar a[href='${navigating.to?.url.pathname}']`)
+        ?.classList.add("is-active");
+    }
+  });
 </script>
 
 <aside id="sidebar" class="menu">
@@ -39,6 +40,7 @@
       <li><a href="/admin/reports">Reports</a></li>
       <li><a href="/admin/users">Users</a></li>
       <li><a href="/admin/settings">Settings</a></li>
+      <li><a href="/admin/generate">Generate Demo Data</a></li>
     </ul>
   {/if}
 </aside>

@@ -4,9 +4,9 @@
   import Switch from "$lib/components/Switch.svelte";
   import axios from "axios";
 
-  export let data;
+  const { data } = $props();
 
-  let edit = !data.case;
+  let edit = $state(!data.case);
 
   function swap_subtypes() {
     let type_select = document.getElementById("type")! as HTMLSelectElement;
@@ -103,7 +103,7 @@
     </a>
   {/if}
 
-  <h1>{data.case ? `Case #${data.case.case_id}` : 'New Case'}</h1>
+  <h1>{data.case ? `Case #${data.case.id}` : 'New Case'}</h1>
 
   <div class="columns">
     <div class="column">
@@ -180,7 +180,7 @@
         <label for="type">Type</label>
         {#if edit}
           <div class="select">
-            <select id="type" on:change={swap_subtypes}>
+            <select id="type" onchange={swap_subtypes}>
               <option value="" selected disabled>&mdash;</option>
               {#each Object.keys(data.types) as type}
                 <option selected={type == data.case?.type}>{type}</option>
@@ -242,7 +242,7 @@
       <button
         id="save"
         class="button is-primary"
-        on:click={() => {
+        onclick={() => {
           edit = false;
           if (data.case) {
             save_case();
@@ -258,7 +258,7 @@
         <button
           id="cancel"
           class="button"
-          on:click={() => edit = false}
+          onclick={() => edit = false}
         >
           Cancel
         </button>
@@ -267,7 +267,7 @@
       <button
         id="edit"
         class="center button is-info"
-        on:click={() => edit = true}
+        onclick={() => edit = true}
       >
         Edit
       </button>

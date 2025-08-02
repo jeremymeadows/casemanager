@@ -9,7 +9,7 @@ git clone git@github.com:jeremymeadows/dkitsu-casemanager.git
 change the information to match your environment
 
 ```
-cd dkitsu-casemanager
+cd casemanager
 vi .env
 ```
 
@@ -35,37 +35,27 @@ DB_PASSWORD="passw0rd"
 
 # run the app
 
-## in Docker (recommended)
+## Docker (recommended)
 
 ```
 npm run docker
 ```
 then visit [https://localhost]
 
-## in Node (for development)
+## Node (for development)
 
 ```
 npm install
 npm run dev
 ```
 
-## in Node (for production)
+## Node (for production)
 
 the server listens on ports `80` and `443` by default so it needs root access to
-run, but that can be changed by setting port numbers to be greater the `1024`
+run, but that can be changed by setting port numbers to be greater than `1024`
 
 ```
 npm install
 npm run build
 sudo npm run serve
 ```
-
-# stop
-
-## in Docker
-
-`docker compose down`
-
-## in Node
-
-`Ctrl-C`

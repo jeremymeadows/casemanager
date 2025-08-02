@@ -7,7 +7,7 @@
   import Chart from "chart.js/auto";
   // import { Colors } from "chart.js";
 
-  export let data;
+  const { data } = $props();
   const cases = data.cases;
   const types = data.types;
   const contact_methods = data.contact_methods;
@@ -25,63 +25,46 @@
     };
 
     return [
-      // new Chart(document.getElementById("status-chart") as HTMLCanvasElement, {
-      //   type: "pie",
-      //   data: {
-      //     labels: ["Open", "Closed"],
-      //     datasets: [
-      //       {
-      //         label: "# of Cases",
-      //         data: [true, false].map(
-      //           (status) => cases.filter((e) => e.is_open === status).length
-      //         ),
-      //         borderWidth: 1,
-      //       },
-      //     ],
-      //   },
-      //   options: options,
-      // }),
       new Chart(document.getElementById("type-chart") as HTMLCanvasElement, {
         type: "pie",
         data: {
           labels: [...Object.keys(types), 'None'],
-          datasets: [
-            {
-              label: "# of Cases",
-              data: [...Object.keys(types), null].map(
-                (type) => cases.filter((e) => e.type === type && ((document.getElementById('open-filter') as HTMLInputElement).checked ? e.is_open : true)).length
-              ),
-              borderWidth: 1,
-            },
-          ],
+          datasets: [{
+            label: "# of Cases",
+            data: [...Object.keys(types), null].map(
+              (type) => cases.filter((e) => e.type === type && ((document.getElementById('open-filter') as HTMLInputElement).checked ? e.is_open : true)).length
+            ),
+            borderWidth: 1,
+          }]
         },
         options: options,
       }),
-      new Chart(
-        document.getElementById("assignee-chart") as HTMLCanvasElement,
-        {
-          type: "pie",
-          data: {
-            labels: [...data.users.map((e) =>
-              e.name
-            ), "Unassigned"],
-            datasets: [
-              {
-                label: "# of Cases per User",
-                data: [...data.users, {user_id: null, name: null}].map(
-                  (user) =>
-                    cases.filter(
-                      (e) =>
-                        e.is_open && e.assignee === user.name
-                    ).length
-                ),
-                borderWidth: 1,
-              },
-            ],
-          },
-          options: options,
-        }
-      ),
+      new Chart(document.getElementById("assignee-chart") as HTMLCanvasElement, {
+        type: "pie",
+        data: {
+          labels: [...data.users.map((e) => e.name), "Unassigned"],
+          datasets: [{
+            label: "# of Cases per User",
+            data: [...data.users, {user_id: null, name: null}].map(
+              (user) => cases.filter((e) => e.is_open && e.assignee?.id === user.id).length
+            ),
+            borderWidth: 1,
+          }]
+        },
+        options: options,
+      }),
+      new Chart(document.getElementById("contact-method-chart") as HTMLCanvasElement, {
+        type: "pie",
+        data: {
+          labels: [...contact_methods, 'N/A'],
+          datasets: [{
+            label: "",
+            data: [...contact_methods, null].map((method) => cases.filter((e) => e.contact_method === method).length),
+            borderWidth: 1,
+          }]
+        },
+        options: options,
+      }),
     ];
   }
 
@@ -267,26 +250,6 @@
       });
   }
 
-  function draw_contact_methods() {
-    let options: object = {
-      animation: {
-        duration: 0,
-      },
-    };
-
-    return new Chart(document.getElementById("contact-method-chart") as HTMLCanvasElement, {
-      type: "pie",
-      data: {
-        labels: [...contact_methods, 'N/A'],
-        datasets: [{
-          label: "",
-          data: [...contact_methods, null].map((method) => cases.filter((e) => e.contact_method === method).length),
-        }],
-      },
-      options: options,
-    });
-  }
-
   onMount(async () => {
     let initial_time = localStorage.getItem("timeline")?.split(";");
     (document.getElementById("date-start")! as HTMLInputElement).value = dtfmt(
@@ -308,7 +271,6 @@
     let charts = draw_charts();
     let timeline = draw_timeline();
     let bar = draw_bar();
-    let contact = draw_contact_methods();
 
     document.getElementById('open-filter')?.addEventListener('click', () => {
       charts.forEach((chart) => chart.destroy());
@@ -324,9 +286,6 @@
 
       bar.destroy();
       bar = draw_bar();
-
-      contact.destroy();
-      contact = draw_contact_methods();
     });
 
     document

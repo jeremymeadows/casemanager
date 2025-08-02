@@ -1,8 +1,10 @@
 <script lang="ts">
-  export let id: string | null = null;
-  export let left: string = "off";
-  export let right: string = "on";
-  export let checked: boolean = false;
+  let {
+    id = null,
+    left = "off",
+    right = "on",
+    checked = false
+  } = $props();
 </script>
 
 <span>

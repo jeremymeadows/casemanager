@@ -6,7 +6,7 @@
 
   import Chart from "chart.js/auto";
 
-  export let data;
+  const { data } = $props();
   const cases = data.cases;
   const types = data.types;
 
@@ -70,7 +70,7 @@
                   (user) =>
                     cases.filter(
                       (e) =>
-                        e.is_open && e.assignee === user.name
+                        e.is_open && e.assignee?.id === user.id
                     ).length
                 ),
                 borderWidth: 1,

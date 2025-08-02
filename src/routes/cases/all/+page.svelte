@@ -5,19 +5,20 @@
   import { dtfmt } from "$lib/utils/dates";
   import { sleep } from "$lib/utils/misc";
 
-  export let data;
+  const { data } = $props();
 
-  let cases = data.cases;
+  const user = data.user;
+  let cases = $state(data.cases);
   // let pins = data.pins;
   let mounted = false;
 
-  let search = '';
-  let sort_method: string = 'created';
-  let sort_reversed = false;
+  let search = $state('');
+  let sort_method: string = $state('created');
+  let sort_reversed = $state(false);
 
-  let status_filter = 'Open';
-  let type_filter: string[] = [];
-  let owner_filter: string[] = [];
+  let status_filter = $state('Open');
+  let type_filter: string[] = $state([]);
+  let owner_filter: string[] = $state([]);
 
   let columns = [
     { field: 'case_id', name: '#' },
@@ -30,7 +31,8 @@
     { field: 'subtype', name: 'Subtype' },
     { field: 'contact_method', name: 'Contact Method' },
   ].concat(data.user.is_admin ? [{ field: 'assignee', name: 'Owner' }] : []);
-  let view_columns = ['status', 'created', 'name', 'type'].concat(data.user.is_admin ? ['assignee'] : []);
+
+  let view_columns = $state(['status', 'created', 'name', 'type'].concat(data.user.is_admin ? ['assignee'] : []));
 
   function sort(field: string) {
     if (sort_method === field) {
@@ -66,7 +68,7 @@
       type_filter.includes(c.type ?? '')
     ) && (
       owner_filter.length === 0 ||
-      owner_filter.includes(String(c.user_id))
+      owner_filter.includes(String(c.assignee?.id ?? 'unassigned'))
     );
   }
 
@@ -93,9 +95,9 @@
     a.remove();
   }
 
-  $: if (mounted) {
+  $effect(() => {
     localStorage.setItem('view_columns', view_columns.join(';'));
-  };
+  });
 
   onMount(async () => {
     mounted = true;
@@ -144,9 +146,10 @@
 
     {#if data.user.is_admin}
       <SelectList id="owner-filter" label="Owner" bind:selection={owner_filter}>
-        {#each data.users as { user_id, name }}
-          <SelectListItem value={user_id} selected={owner_filter.includes(String(user_id))}>{name}</SelectListItem>
+        {#each data.users as { id, name }}
+          <SelectListItem value={id} selected={owner_filter.includes(String(id))}>{name}</SelectListItem>
         {/each}
+        <SelectListItem value="unassigned" selected={owner_filter.includes('unassigned')}>unassigned</SelectListItem>
       </SelectList>
     {/if}
 
@@ -158,7 +161,7 @@
   </div>
   <div>
     <!-- <button class="button" on:click={reset_filters}>Reset Filters</button> -->
-    <button class="button" on:click={export_data}>Export Data</button>
+    <button class="button" onclick={export_data}>Export Data</button>
   </div>
 
   <br />
@@ -166,32 +169,35 @@
   <section>
     <table id="summary" class="table is-hoverable is-fullwidth">
       <thead class="loading">
-        <th class="indicators status" />
-        {#each columns as { field, name }}
-          {#if field === 'status'}
-            <th class="status" hidden={!view_columns.includes(field)}>Status</th>
-          {:else}
-            <th
-              hidden={!view_columns.includes(field)}
-              class:sorted={sort_method === field}
-              class:reversed={sort_reversed}
-              on:click={() => sort(field)}
-            >
-              {name}
-            </th>
-          {/if}
-        {/each}
+        <tr>
+          <th class="indicators status" />
+          {#each columns as { field, name }}
+            {#if field === 'status'}
+              <th class="status" hidden={!view_columns.includes(field)}>Status</th>
+            {:else}
+              <th
+                hidden={!view_columns.includes(field)}
+                class:sorted={sort_method === field}
+                class:reversed={sort_reversed}
+                onclick={() => sort(field)}
+              >
+                {name}
+              </th>
+            {/if}
+          {/each}
+        </tr>
       </thead>
       <tbody class="loading">
         {#each cases as c}
           <tr
-            data-href={`/cases/${c.case_id}`}
-            class:new={c.new && c.user_id === data.user.user_id}
+            data-href={`/cases/${c.id}`}
+            class:new={c.new && c.user_id === data.user.id}
             class:closed={!c.is_open}
             class:filtered={!matches_filter(c) && (status_filter || type_filter || owner_filter || true)}
             title={c.description}
           >
-            <td hidden={!view_columns.includes('case_id')}>{c.case_id}</td>
+            <td></td>
+            <td hidden={!view_columns.includes('case_id')}>{c.id}</td>
             <td hidden={!view_columns.includes('status')}>{c.is_open ? "Open" : "Closed"}</td>
             <td hidden={!view_columns.includes('created')}>{dtfmt("dd mmmm yyyy", c.created)}</td>
             <td hidden={!view_columns.includes('closed')}>{c.closed ? dtfmt("dd mmmm yyyy", c.closed) : ''}</td>
@@ -200,7 +206,7 @@
             <td hidden={!view_columns.includes('type')}>{c.type ?? 'None'}</td>
             <td hidden={!view_columns.includes('subtype')}>{c.subtype ?? 'None'}</td>
             <td hidden={!view_columns.includes('contact_method')}>{c.contact_method ?? 'N/A'}</td>
-            <td hidden={!view_columns.includes('assignee')}>{c.assignee ?? 'Unassigned'}</td>
+            <td hidden={!view_columns.includes('assignee')}>{c.assignee?.name ?? 'unassigned'}</td>
           </tr>
         {/each}
       </tbody>

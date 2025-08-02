@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { navigating } from "$app/stores";
+  import { navigating } from "$app/state";
 
-  export let user: { email: string, name: string };
+  export const { user } = $props();
 
   onMount(async () => {
     const menu = document.getElementById("burger-menu")!;
@@ -18,14 +18,16 @@
       ?.classList.add("is-current-page");
   });
 
-  $: if ($navigating) {
-    document
-      .querySelector(".is-current-page")
-      ?.classList.remove("is-current-page");
-    document
-      .querySelector(`.navbar-item[href='${$navigating.to?.url.pathname}']`)
-      ?.classList.add("is-current-page");
-  }
+  $effect(() => {
+    if (navigating) {
+      document
+        .querySelector(".is-current-page")
+        ?.classList.remove("is-current-page");
+      document
+        .querySelector(`.navbar-item[href='${navigating.to?.url.pathname}']`)
+        ?.classList.add("is-current-page");
+    }
+  });
 </script>
 
 <nav
@@ -34,7 +36,7 @@
   aria-label="main navigation"
 >
   <div class="navbar-brand">
-    <a href="/" class="navbar-item">DkIT SU Case Manager</a>
+    <a href="/" class="navbar-item">Case Manager</a>
 
     <a
       id="burger-menu"
@@ -82,5 +84,10 @@
 
   nav .navbar-brand .navbar-item {
     font-weight: bold;
+  }
+
+  nav .navbar-dropdown {
+    left: auto;
+    right: 0;
   }
 </style>

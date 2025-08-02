@@ -1,6 +1,5 @@
 import { error } from "@sveltejs/kit";
 import { db } from "$lib/server/database";
-import { contact } from "$lib/server/database/schema";
 
 export async function load({ cookies }: { cookies: any }) {
   const session_id = cookies.get("session");
@@ -12,7 +11,5 @@ export async function load({ cookies }: { cookies: any }) {
 
   return {
     users: db.get_users().expect(),
-    types: db.get_case_types().expect(),
-    contact_methods: db.get_contact_methods().expect(),
   };
 }

@@ -1,7 +1,9 @@
 <script lang="ts">
-  export let value: string | null = null;
-  export let selected: boolean = false;
-  let default_value: string;
+  let {
+    value = null,
+    selected = false,
+  } = $props();
+  let default_value: string = $state();
 </script>
 
 <li class="dropdown-item">

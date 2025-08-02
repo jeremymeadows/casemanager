@@ -1,23 +1,23 @@
 <script lang="ts">
   import Navbar from "$lib/components/Navbar.svelte";
   import Sidebar from "$lib/components/Sidebar.svelte";
-  import Footer from "$lib/components/Footer.svelte";
+    import { onMount } from "svelte";
+  // import Footer from "$lib/components/Footer.svelte";
 
   import "/src/global.scss";
 
-  export let data;
+  const { children, data } = $props();
+  let user = $state({name: null, email: null, is_admin: false});
 
-  const user: {
-    user_id: number;
-    email: string;
-    name: string;
-    is_admin: boolean;
-  } = data.user;
+  onMount(() => {
+    user = localStorage.getItem("user")
+      ? (user = JSON.parse(localStorage.getItem("user")!))
+      : (user = null);
+  });
 </script>
 
 <svelte:head>
-  <title>DkIT SU Case Manager</title>
-
+  <title>Case Manager</title>
   <meta name="author" content="Jeremy Meadows" />
 </svelte:head>
 
@@ -28,10 +28,10 @@
 {/if}
 
 <main>
-  <slot />
+  {@render children()}
 </main>
 
-<Footer />
+<!-- <Footer /> -->
 
 <style lang="scss">
   main {

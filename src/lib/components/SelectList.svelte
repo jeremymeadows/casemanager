@@ -1,14 +1,15 @@
-<svelte:options accessors />
-
 <script lang="ts">
   import { onMount } from "svelte";
   import { random_string } from "$lib/utils/misc";
 
-  export let id: string;
-  export let label: string = "Select";
-  export let multiple: boolean = true;
-  export let indicator: boolean = true;
-  export let selection: string[] | string | null = multiple ? [] : null;
+  let {
+    children,
+    id,
+    label = "Select",
+    multiple = true,
+    indicator = true,
+    selection = $bindable(multiple ? [] : null),
+  } = $props();
 
   let component_id = id ?? `s-${random_string(12)}`;
 
@@ -57,7 +58,7 @@
       class:indicator={indicator}
       aria-haspopup="true"
       aria-controls="dropdown-menu"
-      on:click={toggle}
+      onclick={toggle}
     >
       <span>{label}</span>
       <span class="icon">
@@ -68,7 +69,7 @@
   <div class="dropdown-menu" role="menu">
     <form class="dropdown-content">
       <ul>
-        <slot />
+        {@render children()}
       </ul>
     </form>
   </div>

@@ -2,10 +2,10 @@
   import axios from "axios";
   import { open_dialog_modal, close_dialog } from "$lib/utils/dialogs";
 
-  export let data;
+  const { data } = $props();
 
   const users = data.users;
-  let edit_id = "";
+  let edit_id = $state("");
   let delete_id = -1;
 
   function edit(event: MouseEvent) {
@@ -105,14 +105,16 @@
   <section>
     <table id="users" class="table is-hoverable is-fullwidth">
       <thead>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Permissions</th>
-        <th />
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Permissions</th>
+          <th />
+        </tr>
       </thead>
       <tbody>
         {#each users as user}
-          <tr id={user.user_id}>
+          <tr id={user.id}>
             <td>{user.name}</td>
             <td><a href="mailto:{user.email}">{user.email}</a></td>
             <td>{user.is_admin ? "Administrator" : "Normal"}</td>
@@ -121,16 +123,16 @@
               <span hidden={!!edit_id}>
                 <button
                   class="button is-small is-info"
-                  data-for={user.user_id}
-                  on:click={edit}
+                  data-for={user.id}
+                  onclick={edit}
                 >
                   Edit
                 </button>
-                {#if user.user_id !== 1}
+                {#if user.id !== 0}
                   <button
                     class="button is-small is-danger"
-                    data-for={user.user_id}
-                    on:click={() => { delete_id = user.user_id; open_dialog_modal('delete-user'); }}
+                    data-for={user.id}
+                    onclick={() => { delete_id = user.id; open_dialog_modal('delete-user'); }}
                   >
                     Delete
                   </button>
@@ -138,30 +140,30 @@
               </span>
             </td>
           </tr>
-          <tr id="{user.user_id}-edit" hidden>
-            <td><input id="{user.user_id}-name" class="input" type="text" value={user.name} /></td>
-            <td><input id="{user.user_id}-email" class="input" type="email" value={user.email} /></td>
+          <tr id="{user.id}-edit" hidden>
+            <td><input id="{user.id}-name" class="input" type="text" value={user.name} /></td>
+            <td><input id="{user.id}-email" class="input" type="email" value={user.email} /></td>
             <td>
               Administrator:
-              <input id="{user.user_id}-admin" type="checkbox" checked={user.is_admin} disabled={user.user_id === 1} />
+              <input id="{user.id}-admin" type="checkbox" checked={user.is_admin} disabled={user.id === 0} />
             </td>
             <td>
               <span class="buttons has-addons">
                 <button
                   class="button is-small is-success"
-                  on:click={save}
+                  onclick={save}
                 >
                   Save
                 </button>
                 <button
                   class="button is-small is-danger"
-                  on:click={() => open_dialog_modal('password-confirm')}
+                  onclick={() => open_dialog_modal('password-confirm')}
                 >
                   Reset<br />Password
                 </button>
                 <button
                   class="button is-small is-warning"
-                  on:click={cancel}
+                  onclick={cancel}
                 >
                   Cancel
                 </button>
@@ -179,13 +181,13 @@
           <td>
             <button
               class="button is-small is-success"
-              on:click={add_save}
+              onclick={add_save}
             >
               Save
             </button>
             <button
               class="button is-small is-warning"
-              on:click={add_cancel}
+              onclick={add_cancel}
             >
               Cancel
             </button>
@@ -194,21 +196,21 @@
       </tbody>
     </table>
 
-    <button class="button" on:click={add} disabled={!!edit_id}>Add User</button>
+    <button class="button" onclick={add} disabled={!!edit_id}>Add User</button>
 
     <dialog id="password-confirm">
-      <h2>Are you sure you want to reset the password for <code>{users.find((e) => e.user_id == edit_id)?.name}</code>?</h2>
+      <h2>Are you sure you want to reset the password for <code>{users?.find((e: any) => e.user_id == edit_id)?.name}</code>?</h2>
       <br />
       <div class="center">
         <button
           class="button"
-          on:click={close_dialog}
+          onclick={close_dialog}
         >
           Cancel
         </button>
         <button
           class="button is-danger"
-          on:click={(ev) => {
+          onclick={(ev) => {
             close_dialog(ev);
             reset_password();
             cancel();
@@ -222,22 +224,22 @@
     <dialog id="new-password">
       <p>The new password for <span id="password-email" /> is <code id="password" /></p>
       <br />
-      <button class="button center" on:click={close_dialog}>Close</button>
+      <button class="button center" onclick={close_dialog}>Close</button>
     </dialog>
 
     <dialog id="delete-user">
-      <h2>Are you sure you want to delete the user <code>{users.find((e) => e.user_id === delete_id)?.name}</code>?</h2>
+      <h2>Are you sure you want to delete the user <code>{users?.find((e: any) => e.id === delete_id)?.name}</code>?</h2>
       <br />
       <div class="center">
         <button
           class="button"
-          on:click={(ev) => { close_dialog(ev); cancel(); }}
+          onclick={(ev) => { close_dialog(ev); cancel(); }}
         >
           No
         </button>
         <button
           class="button is-danger"
-          on:click={(ev) => {
+          onclick={(ev) => {
             close_dialog(ev);
             remove(delete_id);
           }}

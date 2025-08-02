@@ -1,8 +1,8 @@
 <script lang="ts">
   import axios from "axios";
 
-  function login(event: SubmitEvent) {
-    let form = event.target as HTMLElement;
+  function login() {
+    let form = document.getElementsByTagName('form')[0] as HTMLElement;
     form.querySelectorAll("input").forEach((e: HTMLInputElement) => {
       e.disabled = true;
     });
@@ -15,7 +15,8 @@
         email: email,
         password: password,
       })
-      .then((_res: any) => {
+      .then((user: any) => {
+        localStorage.setItem("user", JSON.stringify(user.data));
         document.location.href = "/";
       })
       .catch((err: any) => {
@@ -42,8 +43,7 @@
     </article>
     <br />
   </div>
-
-  <form class="narrow" on:submit|preventDefault={login}>
+  <form class="narrow">
     <div class="field">
       <label for="email">Email</label>
       <input id="email" type="email" class="input" required />
@@ -52,7 +52,7 @@
       <label for="password">Password</label>
       <input id="password" type="password" class="input" required />
     </div>
-    <input id="submit" type="submit" class="button center" />
+    <button id="submit" class="button center" onclick={login}>Sign In</button>
   </form>
 
   <br /><br />
@@ -60,7 +60,7 @@
   <aside class="narrow">
     The admin of this site must grant new users access. If you need an account
     or forgot your password, contact the office at <a
-      href="mailto:generalmanager@dkitsu.ie">generalmanager@dkitsu.ie</a
+      href="mailto:admin@example.com">admin@example.com</a
     >.
   </aside>
 </article>

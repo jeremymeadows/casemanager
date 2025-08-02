@@ -1,6 +1,5 @@
 import { json, error } from "@sveltejs/kit";
 import { db } from "$lib/server/database";
-import bcrypt from "bcrypt";
 
 export async function POST({
   request,
@@ -11,31 +10,22 @@ export async function POST({
 }) {
   let { email, password } = await request.json();
 
-  let user = await db.query(
-    "SELECT user_id, name, password FROM users WHERE email = $1",
-    [email]
-  );
-
-  if (user.rowCount === 0 || !(await bcrypt.compare(password, user.rows[0]["password"]))) {
-    throw error(401, "no account with matching credentials");
+  let res = await db.signin(email, password);
+  if (!res.ok) {
+    throw error(400, res.error.message);
   }
-
-  let res = await db.query(
-    "INSERT INTO sessions (user_id) VALUES ($1) RETURNING session_id, expires",
-    [user.rows[0].user_id]
-  );
-  let { session_id, expires } = res.rows[0];
+  let { session_id, expires } = res.value;
+  let user = db.get_user(session_id);
 
   cookies.set("session", session_id, { path: "/", expires: new Date(expires) });
 
-  return json(res.rows[0]);
+  return json(user.value);
 }
 
 export async function DELETE({ cookies }: { cookies: any }) {
   const session_id = cookies.get("session");
-
-  await db.query("DELETE FROM sessions WHERE session_id = $1 OR expires < CURRENT_DATE", [session_id]);
-  cookies.delete("session");
+  await db.signout(session_id);
+  cookies.delete("session", { path: "/" });
 
   return json(true);
 }

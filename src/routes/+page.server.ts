@@ -1,32 +1,19 @@
 import { db } from "$lib/server/database";
 import { get_session } from "$lib/utils/auth";
+import { error } from "@sveltejs/kit";
 
 export async function load({ cookies }: { cookies: any }) {
   const session_id = get_session(cookies);
+  let cases = await db.get_cases(session_id);
 
-  let cases = await db.query(
-    `
-      SELECT
-        case_id,
-        cases.name,
-        is_open,
-        type,
-        created,
-        closed,
-        users.name as assignee
-      FROM cases
-      LEFT JOIN users ON cases.assignee = users.user_id
-      WHERE
-        CASE
-          WHEN (SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1)
-            THEN TRUE
-            ELSE assignee = (SELECT user_id FROM sessions WHERE session_id = $1) OR assignee IS NULL
-        END
-      `,
-    [session_id]
-  );
+  if (!cases.ok) {
+    error(500, cases.error);
+  }
 
   return {
-    cases: cases.rows,
+    // cases: cases.rows,
+    cases: cases.expect(),
+    types: db.get_case_types().expect(),
+    users: db.get_users().expect(),
   };
 }

@@ -1,5 +1,5 @@
 import { json, error } from "@sveltejs/kit";
-import { db, is_admin } from "$lib/server/database";
+import { db } from "$lib/server/database";
 
 export async function POST({
   request,
@@ -9,14 +9,15 @@ export async function POST({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify app settings");
   }
 
   let { method } = await request.json();
 
-  await db.query("INSERT INTO contact (method) VALUES ($1)", [method]);
+  db.add_contact_method(method);
 
   return json(true);
 }
@@ -29,19 +30,15 @@ export async function DELETE({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
-  if (!(await is_admin(session_id))) {
+  if (!user.ok || !user.value.is_admin) {
     throw error(403, "cannot modify app settings");
   }
 
   let { method } = await request.json();
 
-  await db.query(
-    "UPDATE cases SET contact_method = NULL WHERE contact_method = $1",
-    [method]
-  );
-
-  await db.query("DELETE FROM contact WHERE method = $1", [method]);
+  db.delete_contact_method(method);
 
   return json(true);
 }
