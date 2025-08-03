@@ -55,7 +55,7 @@
 
   async function create_case() {
     axios
-      .post("/api/cases", get_case())
+      .post("/cases", get_case())
       .then((res) => {
         window.location.pathname = `/cases/${res.data}`;
       })
@@ -75,7 +75,7 @@
     }
 
     axios
-      .put("/api/cases", {
+      .put("/cases", {
         case_id: data.case.case_id,
         new: data.case.assignee != new_case.assignee,
         closed: closed,

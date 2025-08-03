@@ -56,16 +56,17 @@ export async function PATCH({
   cookies: any;
 }) {
   const session_id = cookies.get("session");
+  const user = db.get_user(session_id);
 
   let data = await request.json();
   let { user_id, password } = data;
 
   if (user_id) {
-    if (!(await is_admin(session_id))) {
+    if (!user.ok || !user.value.is_admin) {
       throw error(403, "cannot modify user accounts");
     }
   } else {
-    user_id = (await get_user(session_id)).user_id;
+    user_id = user.value.id;
 
     let res = await db.query("SELECT password FROM users WHERE user_id = $1", [
       user_id,

@@ -4,7 +4,7 @@
   const { data } = $props();
 
   function logout_all() {
-
+    alert('todo')
   }
 
   function check_password(): boolean {
@@ -77,12 +77,14 @@
     <br />
   </div>
 
-  <!-- <button -->
-  <!--   class="button center" -->
-  <!--   on:click={logout_all} -->
-  <!-- > -->
-  <!--   Log Out Everywhere -->
-  <!-- </button> -->
+  <button
+    class="button center"
+    onclick={logout_all}
+  >
+    Log Out Everywhere
+  </button>
+
+  <br />
 
   <div>
     <button

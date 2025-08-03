@@ -1,15 +1,14 @@
-FROM node:current-alpine
+FROM oven/bun:alpine
 
 WORKDIR /app
 
-COPY .env server.js ./
-COPY build/ ./build/
+COPY build/ ./
 
-RUN apk add postgresql -y
+COPY package.json bun.lock ./
+RUN bun add @sveltejs/kit
+RUN bun install --production --frozen-lockfile
 
-RUN npm install dotenv express pg
-RUN npm pkg set type=module
 
-EXPOSE 80 443
+EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["bun", "index.js"]

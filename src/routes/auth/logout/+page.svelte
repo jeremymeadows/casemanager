@@ -4,9 +4,10 @@
 
   onMount(() => {
     axios
-      .delete("/api/auth")
+      .delete("/auth")
       .then((_res) => {
         window.location.href = "/auth/login";
+        localStorage.removeItem("user");
       })
       .catch((err) => {
         console.log(err, "failed");

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
+
   import { navigating } from "$app/state";
+  import { DEMO_MODE } from "$env/static/public";
 
   let { admin, has_new } = $props();
 
@@ -40,7 +42,9 @@
       <li><a href="/admin/reports">Reports</a></li>
       <li><a href="/admin/users">Users</a></li>
       <li><a href="/admin/settings">Settings</a></li>
-      <li><a href="/admin/generate">Generate Demo Data</a></li>
+      {#if DEMO_MODE}
+        <li><a href="/admin/generate">Generate Demo Data</a></li>
+      {/if}
     </ul>
   {/if}
 </aside>

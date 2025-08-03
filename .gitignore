@@ -1,6 +1,9 @@
 node_modules/
 .svelte-kit/
 build/
+docker/
+
 .env
+.env.*
+
 *.sqlite
-*.tar

@@ -1,6 +1,8 @@
 <script lang="ts">
   import axios from "axios";
 
+  const { data } = $props();
+
   function login() {
     let form = document.getElementsByTagName('form')[0] as HTMLElement;
     form.querySelectorAll("input").forEach((e: HTMLInputElement) => {
@@ -11,7 +13,7 @@
     let password = (form.querySelector("#password")! as HTMLInputElement).value;
 
     axios
-      .post("/api/auth", {
+      .post("/auth", {
         email: email,
         password: password,
       })
@@ -58,10 +60,7 @@
   <br /><br />
 
   <aside class="narrow">
-    The admin of this site must grant new users access. If you need an account
-    or forgot your password, contact the office at <a
-      href="mailto:admin@example.com">admin@example.com</a
-    >.
+    {@html data.message}
   </aside>
 </article>
 

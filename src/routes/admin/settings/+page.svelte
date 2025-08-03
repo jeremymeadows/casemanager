@@ -24,8 +24,8 @@
       editing = el.getAttribute("data-for")!;
     } else {
       let res = subtype
-        ? axios.put("/api/admin/settings", { type: type, subtype: subtype })
-        : axios.post("/api/admin/settings", { type: type });
+        ? axios.put("/admin/settings", { type: type, subtype: subtype })
+        : axios.post("/admin/settings", { type: type });
       res
         .then(() => {
           editing = "";
@@ -49,8 +49,8 @@
       ) as HTMLButtonElement
     ).onclick = () => {
       let res = subtype
-        ? axios.patch("/api/admin/settings", { type: type, subtype: subtype })
-        : axios.delete("/api/admin/settings", { data: { type: type } });
+        ? axios.patch("/admin/settings", { type: type, subtype: subtype })
+        : axios.delete("/admin/settings", { data: { type: type } });
       res
         .then(() => {
           editing = "";
@@ -74,7 +74,7 @@
     if (editing === "") {
       editing = "new-contact-method";
     } else {
-      let res = axios.post("/api/admin/settings/contact", { method: method });
+      let res = axios.post("/admin/settings/contact", { method: method });
       res
         .then(() => {
           editing = "";
@@ -97,7 +97,7 @@
         '#delete-confirm-contact button[value="delete"]'
       ) as HTMLButtonElement
     ).onclick = () => {
-      let res = axios.delete("/api/admin/settings/contact", {
+      let res = axios.delete("/admin/settings/contact", {
         data: { method: method },
       });
       res

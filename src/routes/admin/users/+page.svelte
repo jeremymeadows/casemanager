@@ -25,7 +25,7 @@
     document.getElementById(`${edit_id}-edit`)!.hidden = true;
 
     axios
-      .put("/api/admin/users", {
+      .put("/admin/users", {
         user_id: edit_id,
         name: (document.getElementById(`${edit_id}-name`) as HTMLInputElement).value,
         email: (document.getElementById(`${edit_id}-email`) as HTMLInputElement).value,
@@ -41,7 +41,7 @@
 
   function reset_password() {
     axios
-      .patch("/api/admin/users", {
+      .patch("/admin/users", {
         user_id: edit_id,
       })
       .then((res: any) => {
@@ -72,7 +72,7 @@
 
   function add_save() {
     axios
-      .post("/api/admin/users", {
+      .post("/admin/users", {
         name: (document.getElementById('name') as HTMLInputElement).value,
         email: (document.getElementById('email') as HTMLInputElement).value,
         admin: (document.getElementById('admin') as HTMLInputElement).checked,
@@ -87,7 +87,7 @@
 
   function remove(user_id: number) {
     axios
-      .delete("/api/admin/users", { data: {
+      .delete("/admin/users", { data: {
         user_id: user_id,
       }})
       .then((_res: any) => {

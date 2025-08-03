@@ -1,44 +1,26 @@
-version: '3'
-
-secrets:
-  tls_certificate:
-    file: ${TLS_CERT}
-  tls_certificate_key:
-    file: ${TLS_CERT_KEY}
+networks:
+  vnet:
+    external: true
 
 services:
-  app:
-    container_name: app
-    image: dkitsu
+  web:
+    container_name: casemanager
+    image: casemanager:latest
     build: .
-    ports: 
-      - '${HTTP_PORT:-80}:80'
-      - '${HTTPS_PORT:-443}:443'
     environment:
-      - DB_HOST=db
-      - DB_DATABASE=dkitsu
-      - HTTP_PORT=80
-      - HTTP_PORT=443
-      - TLS_CERT=/run/secrets/cert.pem
-      - TLS_CERT_KEY=/run/secrets/cert-key.pem
-    secrets:
-      - source: tls_certificate
-        target: cert.pem
-      - source: tls_certificate_key
-        target: cert-key.pem
-    restart: always
-    depends_on:
-      - db
-
-  db:
-    container_name: db
-    image: postgres
-    expose: 
-      - 5432
+      - 'HOST=0.0.0.0'
+      - 'PORT=3000'
+      - 'ADMIN_EMAIL="alice@jeremymeadows.dev"'
+      - 'ADMIN_USERNAME="Alice"'
+      - 'ADMIN_PASSWORD="passw0rd"'
+      - 'SPLASH_MESSAGE="Sign in to the demo app with the credentials `$ADMIN_EMAIL` and `$ADMIN_PASSWORD`."'
+      - 'DEMO_MODE="true"'
+    networks:
+      - vnet
     volumes:
-      - ./database:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=dkitsu
+      - type: bind
+        source: ./db.sqlite
+        target: /app/db.sqlite
+    expose:
+      - 3000
     restart: always

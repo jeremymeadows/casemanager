@@ -10,11 +10,14 @@ const config = {
 
   kit: {
     adapter: adapter(),
+    env: {
+      privatePrefix: "ADMIN_",
+      publicPrefix: "",
+    }
   },
   compilerOptions: {
     runes: true
   },
-  optimizeDeps: { include: ["pg"], exclude: ["pg-native"] },
 };
 
 export default config;

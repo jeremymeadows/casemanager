@@ -1,6 +1,7 @@
 import { json, error } from "@sveltejs/kit";
 import { db } from "$lib/server/database";
 
+// sign in
 export async function POST({
   request,
   cookies,
@@ -22,6 +23,7 @@ export async function POST({
   return json(user.value);
 }
 
+// sign out
 export async function DELETE({ cookies }: { cookies: any }) {
   const session_id = cookies.get("session");
   await db.signout(session_id);

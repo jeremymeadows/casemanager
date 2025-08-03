@@ -1,17 +1,11 @@
 import { Database as BunSqlite } from "bun:sqlite";
 import { type BunSQLiteDatabase, drizzle } from "drizzle-orm/bun-sqlite";
 import { sql, eq, ne } from "drizzle-orm";
-// import { seed, reset } from "drizzle-seed";
 
 import { Result } from '$lib';
 
-import dotenv from "dotenv";
-
-dotenv.config();
-
 import queries from './queries';
 import * as schema from './schema';
-import { _ } from "$env/static/private";
 
 export class Database {
   [key: string]: any;
@@ -30,12 +24,12 @@ export class Database {
     }
   }
 
-  get_user(session_id: string): Result<{ id: number, name: string, is_admin: boolean }> {
+  get_user(session_id: string): Result<{ id: number, email: string, name: string, is_admin: boolean }> {
     if (!session_id) {
       return Result.Err(new Error("failed to get user: no session_id"));
     }
 
-    let res = this.db.select({ id: schema.users.id, name: schema.users.name, is_admin: schema.users.is_admin })
+    let res = this.db.select({ id: schema.users.id, email: schema.users.email, name: schema.users.name, is_admin: schema.users.is_admin })
       .from(schema.users)
       .innerJoin(schema.sessions, eq(schema.users.id, schema.sessions.user_id))
       .where(eq(schema.sessions.id, session_id))
@@ -95,23 +89,3 @@ export class Database {
 
 export const db = new Database("db.sqlite", { create: true });
 await db.init();
-
-// export async function get_user(
-//   session_id: string
-// ): Promise<{ user_id: number; email: string; name: string }> {
-//   let res = await db.query(
-//     "SELECT user_id, email, name FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
-//     [session_id]
-//   );
-
-//   return res.rows[0];
-// }
-
-// export async function is_admin(session_id: string): Promise<boolean> {
-//   let res = await db.query(
-//     "SELECT is_admin FROM users JOIN sessions USING (user_id) WHERE session_id = $1",
-//     [session_id]
-//   );
-
-//   return res.rowCount !== 0 && res.rows[0].is_admin;
-// }
